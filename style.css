@@ -6,3 +6,43 @@
    box-sizing: border-box;
    font-family: 'Poppins', sans-serif;
 }
+
+body{
+   background-color: #f3f3f3;
+}
+
+header{
+   text-align: center;
+}
+
+header img{
+   width: 100px;
+   margin-top: 40px;
+}
+
+header h1{
+   margin: 20px 200px 20px 30px;
+   text-align: left;
+   font-weight: 500;
+   font-size: 1.5em;
+}
+
+header input{
+   background-color: rgb(224, 224, 224);
+   width: 85%;
+   height: 50px;
+   border-radius: 5px;
+   border: none;
+   padding: 0 20px;
+   font-size: .8em;;
+}
+
+input::placeholder {
+  color: #9c9c9c;
+}
+
+input:focus, textarea:focus {
+    outline: none;
+    border: 1px solid rgb(177, 177, 177);
+    box-shadow: 0 0 2px rgba(95, 95, 95, 0.5);
+   }
