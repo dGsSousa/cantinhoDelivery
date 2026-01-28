@@ -11,8 +11,14 @@ body{
    background-color: #f3f3f3;
 }
 
+
+/* Cabeçalho */
+
 header{
-   text-align: center;
+   display: flex;
+   align-items: center;
+   flex-direction: column;
+   
 }
 
 header img{
@@ -21,10 +27,10 @@ header img{
 }
 
 header h1{
-   margin: 20px 200px 20px 30px;
+   margin: 20px 200px 20px 40px;
    text-align: left;
-   font-weight: 500;
-   font-size: 1.5em;
+   font-weight: 400;
+   font-size: 1.7em;
 }
 
 header input{
@@ -34,7 +40,7 @@ header input{
    border-radius: 5px;
    border: none;
    padding: 0 20px;
-   font-size: .8em;;
+   font-size: .8em;
 }
 
 input::placeholder {
@@ -46,3 +52,52 @@ input:focus, textarea:focus {
     border: 1px solid rgb(177, 177, 177);
     box-shadow: 0 0 2px rgba(95, 95, 95, 0.5);
    }
+
+/* Menu de opções */
+
+.opcoes {
+   overflow-x: auto; /* Permite scroll horizontal */
+   overflow-y: hidden;
+   scrollbar-width: none; /* Firefox */
+   -ms-overflow-style: none; /* IE e Edge */
+}
+
+.opcoes::-webkit-scrollbar {
+   display: none; /* Chrome, Safari e Opera */ 
+}
+.opcoes ul {
+   display: flex;
+   justify-content: flex-start; /* Alinha itens à esquerda */
+   flex-wrap: nowrap;
+   margin-top: 30px;
+   gap: 10px; /* Espaçamento entre itens */
+   padding: 10px 0; /* Padding para não cortar a barra */
+}
+
+li {
+   list-style: none;
+   flex-shrink: 0; /* Impede que os itens encolham */
+}
+
+.opcoes a {
+   display: flex;
+   align-items: center;
+   flex-direction: column;
+   border-radius: 5px;
+   padding: 15px;
+   text-decoration: none;
+   background-color: #ff8787;
+   color: rgb(29, 29, 29);
+   white-space: nowrap; /* Evita quebra de texto */
+   width: 80px;
+   height: 80px;
+   box-sizing: border-box;
+   font-size: .7em;
+   text-align: center;;
+}
+
+.opcoes img {
+   width: 30px;
+   height: 30px;
+   margin-bottom: 5px; /* Espaço entre ícone e texto */
+}
