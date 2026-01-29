@@ -27,10 +27,16 @@ header img{
 }
 
 header h1{
-   margin: 20px 200px 20px 40px;
-   text-align: left;
+   margin: 20px 40px;
+   text-align: left; /* Mudei para center já que está em column */
    font-weight: 400;
    font-size: 1.7em;
+   width: 85%;
+   display: -webkit-box;
+   line-clamp: 2;
+   -webkit-box-orient: vertical;
+   overflow: hidden;
+   line-height: 1.3;
 }
 
 header input{
@@ -65,13 +71,13 @@ input:focus, textarea:focus {
 .opcoes::-webkit-scrollbar {
    display: none; /* Chrome, Safari e Opera */ 
 }
+
 .opcoes ul {
    display: flex;
    justify-content: flex-start; /* Alinha itens à esquerda */
    flex-wrap: nowrap;
-   margin-top: 30px;
-   gap: 10px; /* Espaçamento entre itens */
-   padding: 10px 0; /* Padding para não cortar a barra */
+   margin-top: 20px;
+   
 }
 
 li {
@@ -82,22 +88,44 @@ li {
 .opcoes a {
    display: flex;
    align-items: center;
+   justify-content: center;
    flex-direction: column;
    border-radius: 5px;
-   padding: 15px;
-   text-decoration: none;
    background-color: #ff8787;
-   color: rgb(29, 29, 29);
-   white-space: nowrap; /* Evita quebra de texto */
-   width: 80px;
-   height: 80px;
-   box-sizing: border-box;
-   font-size: .7em;
-   text-align: center;;
+   width: 50px;
+   height: 50px;
+   margin-left: 10px;
 }
 
 .opcoes img {
-   width: 30px;
-   height: 30px;
-   margin-bottom: 5px; /* Espaço entre ícone e texto */
+   width: 27px;
+   height: 27px;
 }
+
+/* Rodapé */
+
+footer{
+   position: fixed;
+   bottom: 0;
+   width: 100%;
+   height: 45px;
+   background-color: #ff4747;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+
+footer a{
+   color: white;
+   text-decoration: none;
+   font-size: .8em;
+   display: flex;
+   align-items: center;
+   gap: 8px;
+}
+
+footer img{
+   width: 20px;
+   height: 20px;
+}
+
