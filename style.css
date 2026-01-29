@@ -9,6 +9,7 @@
 
 body{
    background-color: #f3f3f3;
+   overflow-y: hidden;
 }
 
 
@@ -77,7 +78,6 @@ input:focus, textarea:focus {
    justify-content: flex-start; /* Alinha itens à esquerda */
    flex-wrap: nowrap;
    margin-top: 20px;
-   
 }
 
 li {
@@ -102,10 +102,68 @@ li {
    height: 27px;
 }
 
+/* Seções de produtos */
+
+.secoes {
+   overflow-x: hidden; /* Permite scroll horizontal */
+   overflow-y: auto;
+   scrollbar-width: none; /* Firefox */
+   -ms-overflow-style: none; /* IE e Edge */
+   padding-bottom: 45px;
+}
+
+.secoes::-webkit-scrollbar {
+   display: none; /* Chrome, Safari e Opera */ 
+}
+
+.secoes ul{
+   display: flex;
+   align-items: center; /* Alinha itens à esquerda */
+   margin-top: 20px;
+   flex-direction: column;
+}
+
+.secoes ul li{
+   position: relative;
+   background-color: rgb(44, 44, 44);
+   width: 250px;
+   height: 130px;
+   margin-bottom: 15px;
+   border-radius: 5px;
+   overflow: hidden;
+}
+
+.secoes ul li img{
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   object-fit: cover;
+   pointer-events: none;
+}
+
+.secoes ul li a {
+   position: relative;
+   z-index: 10;
+   display: flex;
+   align-items: flex-end;
+   justify-content: right;
+   height: 100%;
+   color: white;
+   text-decoration: none;
+   padding: 10px;
+   font-size: 1.7em;
+   text-transform: uppercase;
+   font-weight: 500;
+   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
 /* Rodapé */
 
 footer{
    position: fixed;
+   z-index: 10;
    bottom: 0;
    width: 100%;
    height: 45px;
