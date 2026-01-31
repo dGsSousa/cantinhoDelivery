@@ -184,11 +184,49 @@
 </section>
 
    </main>
-</body>
 
-<footer>
-      <a href="#carrinho">(0) Meu Carrinho <img src="icons/carrinho-icon.png" alt="icone de um carrinho de compras"></a>
-</footer>
+<!-- Overlay escuro de fundo -->
+<div class="carrinho-overlay" id="carrinhoOverlay"></div>
+
+<!-- Painel do carrinho -->
+<div class="carrinho-painel" id="carrinhoPainel">
+   <!-- Barra de arrasto -->
+   <div class="carrinho-handle">
+      <div class="handle-bar"></div>
+   </div>
+   
+   <!-- Cabeçalho do carrinho -->
+   <div class="carrinho-header">
+      <h2>Meu Carrinho</h2>
+      <button class="fechar-carrinho" id="fecharCarrinho">
+         <span>✕</span>
+      </button>
+   </div>
+   
+   <!-- Lista de itens do carrinho -->
+   <div class="carrinho-conteudo" id="carrinhoConteudo">
+      <div class="carrinho-vazio" id="carrinhoVazio">
+         <p>Seu carrinho está vazio</p>
+         <p class="subtexto">Adicione produtos para começar seu pedido</p>
+      </div>
+      
+      <!-- Os itens serão adicionados aqui dinamicamente -->
+      <div class="carrinho-itens" id="carrinhoItens"></div>
+   </div>
+   
+   <!-- Rodapé com total e botão de finalizar -->
+   <div class="carrinho-footer">
+      <div class="total-container">
+         <span>Total:</span>
+         <span class="total-valor" id="totalValor">R$ 0,00</span>
+      </div>
+      <button class="finalizar-pedido" id="finalizarPedido">
+         Finalizar Pedido
+      </button>
+   </div>
+</div>
+
+</body>
 
 <script src="scripts.js"></script>
 
