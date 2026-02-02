@@ -485,25 +485,3 @@ footer img{
    background-color: #ccc;
    cursor: not-allowed;
 }
-
-/* Barra de arrasto do carrinho */
-.carrinho-handle{
-   width: 100%;
-   height: 30px;
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   cursor: grab;
-   flex-shrink: 0;
-}
-
-.carrinho-handle:active{
-   cursor: grabbing;
-}
-
-.handle-bar{
-   width: 50px;
-   height: 5px;
-   background-color: #ccc;
-   border-radius: 5px;
-}

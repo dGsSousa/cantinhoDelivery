@@ -1,19 +1,13 @@
 // ========== VARIÁVEIS GLOBAIS ==========
 let carrinho = [];
-let carrinhoPainel, carrinhoOverlay, carrinhoHandle;
-let startY = 0;
-let currentY = 0;
-let isDragging = false;
-let painelHeight = 0;
 
 // ========== AGUARDA CARREGAMENTO DA PÁGINA ==========
 document.addEventListener('DOMContentLoaded', function () {
    
    // ========== INICIALIZA ELEMENTOS DO DOM ==========
-   carrinhoPainel = document.getElementById('carrinhoPainel');
-   carrinhoOverlay = document.getElementById('carrinhoOverlay');
+   const carrinhoPainel = document.getElementById('carrinhoPainel');
+   const carrinhoOverlay = document.getElementById('carrinhoOverlay');
    const fecharCarrinhoBtn = document.getElementById('fecharCarrinho');
-   carrinhoHandle = document.querySelector('.carrinho-handle');
    const footerCarrinho = document.querySelector('footer a');
    const menuLinks = document.querySelectorAll('.opcoes a');
    
@@ -77,74 +71,22 @@ document.addEventListener('DOMContentLoaded', function () {
    }
    
    // ========== EVENTOS DE ABRIR/FECHAR ==========
+   
+   // Clicar no footer abre o carrinho
    footerCarrinho.addEventListener('click', function(e) {
       e.preventDefault();
       abrirCarrinho();
    });
    
+   // Clicar no X fecha o carrinho
    fecharCarrinhoBtn.addEventListener('click', fecharCarrinho);
+   
+   // Clicar no overlay (fundo escuro) fecha o carrinho
    carrinhoOverlay.addEventListener('click', fecharCarrinho);
-   
-   // ========== ARRASTO - INICIAR ==========
-   carrinhoHandle.addEventListener('mousedown', iniciarArrasto);
-   carrinhoHandle.addEventListener('touchstart', iniciarArrasto);
-   
-   function iniciarArrasto(e) {
-      isDragging = true;
-      painelHeight = carrinhoPainel.offsetHeight;
-      
-      if (e.type === 'mousedown') {
-         startY = e.clientY;
-      } else {
-         startY = e.touches[0].clientY;
-      }
-      
-      carrinhoPainel.style.transition = 'none';
-   }
-   
-   // ========== ARRASTO - DURANTE ==========
-   document.addEventListener('mousemove', arrastar);
-   document.addEventListener('touchmove', arrastar);
-   
-   function arrastar(e) {
-      if (!isDragging) return;
-      
-      if (e.type === 'mousemove') {
-         currentY = e.clientY;
-      } else {
-         currentY = e.touches[0].clientY;
-      }
-      
-      const diffY = currentY - startY;
-      
-      if (diffY > 0) {
-         carrinhoPainel.style.transform = `translateY(${diffY}px)`;
-      }
-   }
-   
-   // ========== ARRASTO - FINALIZAR ==========
-   document.addEventListener('mouseup', finalizarArrasto);
-   document.addEventListener('touchend', finalizarArrasto);
-   
-   function finalizarArrasto() {
-      if (!isDragging) return;
-      isDragging = false;
-      
-      carrinhoPainel.style.transition = 'transform 0.3s ease';
-      
-      const diffY = currentY - startY;
-      
-      if (diffY > painelHeight * 0.3) {
-         fecharCarrinho();
-      } else {
-         carrinhoPainel.style.transform = 'translateY(0)';
-      }
-   }
    
    // ========== EVENT DELEGATION - ADICIONAR AO CARRINHO ==========
    document.body.addEventListener('click', function(e) {
       if (e.target.classList.contains('adicionar-carrinho')) {
-         console.log('Botão clicado!'); // Debug
          
          const botao = e.target;
          const produtoDiv = botao.closest('.produto');
@@ -157,8 +99,6 @@ document.addEventListener('DOMContentLoaded', function () {
          const nome = produtoDiv.querySelector('h3').textContent;
          const preco = produtoDiv.querySelector('.preco').textContent;
          const img = produtoDiv.querySelector('img').src;
-         
-         console.log('Produto:', nome, preco); // Debug
          
          const produto = {
             id: Date.now(),
@@ -176,8 +116,6 @@ document.addEventListener('DOMContentLoaded', function () {
          } else {
             carrinho.push(produto);
          }
-         
-         console.log('Carrinho:', carrinho); // Debug
          
          atualizarCarrinho();
          
