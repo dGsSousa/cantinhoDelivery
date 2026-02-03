@@ -1,5 +1,14 @@
 // ========== VARIÁVEIS GLOBAIS ==========
 let carrinho = [];
+let etapaAtual = 1; // Controla em qual etapa está
+let dadosPedido = {
+   itens: [],
+   total: 0,
+   tipoEntrega: null,
+   endereco: null,
+   formaPagamento: null,
+   troco: null
+};
 
 // ========== AGUARDA CARREGAMENTO DA PÁGINA ==========
 document.addEventListener('DOMContentLoaded', function () {
@@ -8,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
    const carrinhoPainel = document.getElementById('carrinhoPainel');
    const carrinhoOverlay = document.getElementById('carrinhoOverlay');
    const fecharCarrinhoBtn = document.getElementById('fecharCarrinho');
-   const footerCarrinho = document.querySelector('footer a');
+   const footerCarrinho = document.querySelector('footer');
    const menuLinks = document.querySelectorAll('.opcoes a');
    
    // ========== NAVEGAÇÃO DO MENU ==========
@@ -141,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (carrinho.length === 0) {
          carrinhoVazio.style.display = 'block';
          totalValor.textContent = 'R$ 0,00';
-         footerCarrinho.innerHTML = '(0) Meu Carrinho <img src="icons/carrinho-icon.png" alt="icone de um carrinho de compras">';
+         footerCarrinho.innerHTML = '<a href="#carrinho">(0) Meu Carrinho <img src="icons/carrinho-icon.png" alt="icone de um carrinho de compras"></a>';
          return;
       }
       
@@ -174,8 +183,8 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       
       totalValor.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
-      footerCarrinho.innerHTML = `(${quantidadeTotal}) Meu Carrinho <img src="icons/carrinho-icon.png" alt="icone de um carrinho de compras">`;
-   }
+      footerCarrinho.innerHTML = `<a href="#carrinho">(${quantidadeTotal}) Meu Carrinho <img src="icons/carrinho-icon.png" alt="icone de um carrinho de compras"></a>`;
+}
    
    // ========== BOTÕES DO CARRINHO ==========
    document.body.addEventListener('click', function(e) {
@@ -212,5 +221,11 @@ document.addEventListener('DOMContentLoaded', function () {
          atualizarCarrinho();
       }
    });
+   
+
+
+
+
+
    
 });

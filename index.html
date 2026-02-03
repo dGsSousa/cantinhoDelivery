@@ -192,34 +192,181 @@
 <div class="carrinho-painel" id="carrinhoPainel">
    
    <!-- Cabeçalho do carrinho -->
-   <div class="carrinho-header">
-      <h2>Meu Carrinho</h2>
-      <button class="fechar-carrinho" id="fecharCarrinho">
-         <span>✕</span>
-      </button>
-   </div>
    
-   <!-- Lista de itens do carrinho -->
-   <div class="carrinho-conteudo" id="carrinhoConteudo">
-      <div class="carrinho-vazio" id="carrinhoVazio">
-         <p>Seu carrinho está vazio</p>
-         <p class="subtexto">Adicione produtos para começar seu pedido</p>
+      <div class="carrinho-header">
+         <button class="voltar-carrinho" id="voltarCarrinho" style="display: none;">
+            <span>←</span>
+         </button>
+         <h2 id="tituloCarrinho">Meu Carrinho</h2>
+         <button class="fechar-carrinho" id="fecharCarrinho">
+            <span>✕</span>
+         </button>
       </div>
       
-      <!-- Os itens serão adicionados aqui dinamicamente -->
-      <div class="carrinho-itens" id="carrinhoItens"></div>
+
+   <!-- ETAPA 1: LISTA DE PRODUTOS -->
+   <div class="etapa-1" id="etapa1">
+   
+      <!-- Lista de itens do carrinho -->
+      <div class="carrinho-conteudo" id="carrinhoConteudo">
+         <div class="carrinho-vazio" id="carrinhoVazio">
+            <p>Seu carrinho está vazio</p>
+            <p class="subtexto">Adicione produtos para começar seu pedido</p>
+         </div>
+      
+         <!-- Os itens serão adicionados aqui dinamicamente -->
+         <div class="carrinho-itens" id="carrinhoItens"></div>
+      </div>
+      
+      <!-- Rodapé da etapa 1 -->
+      <div class="carrinho-footer">
+         <div class="total-container">
+            <span>Total:</span>
+            <span class="total-valor" id="totalValor">R$ 0,00</span>
+         </div>
+         <button class="continuar-pedido" id="continuarPedido">
+            Continuar
+         </button>
+      </div>
+   </div>
+
+   <!-- ETAPA 2: FORMULÁRIO DE DADOS -->
+
+   <div class="etapa-2" id="etapa2" style="display: none;">
+      
+      <!-- Conteúdo do formulário -->
+      <div class="formulario-conteudo" id="formularioConteudo">
+         
+         <!-- Resumo do pedido -->
+         <div class="resumo-pedido">
+            <h3>Resumo do Pedido</h3>
+            <div class="resumo-itens" id="resumoItens"></div>
+            <div class="resumo-total">
+               <strong>Total:</strong>
+               <strong id="resumoTotal">R$ 0,00</strong>
+            </div>
+         </div>
+         
+         <!-- Seção: Tipo de Entrega -->
+         <div class="form-secao">
+            <h3>Como deseja receber?</h3>
+            <div class="radio-group">
+               <label class="radio-opcao">
+                  <input type="radio" name="tipoEntrega" value="entrega" id="radioEntrega">
+                  <span class="radio-custom"></span>
+                  <div class="radio-texto">
+                     <strong>Entrega no endereço</strong>
+                     <small>Receba em casa</small>
+                  </div>
+               </label>
+               
+               <label class="radio-opcao">
+                  <input type="radio" name="tipoEntrega" value="retirada" id="radioRetirada">
+                  <span class="radio-custom"></span>
+                  <div class="radio-texto">
+                     <strong>Retirar no local</strong>
+                     <small>Buscar pessoalmente</small>
+                  </div>
+               </label>
+            </div>
+         </div>
+         
+         <!-- Seção: Endereço (aparece apenas se "Entrega" selecionado) -->
+         <div class="form-secao secao-endereco" id="secaoEndereco" style="display: none;">
+            <h3>Endereço de entrega</h3>
+            
+            <div class="form-grupo">
+               <label for="rua">Rua *</label>
+               <input type="text" id="rua" placeholder="Nome da rua">
+            </div>
+            
+            <div class="form-linha">
+               <div class="form-grupo form-grupo-pequeno">
+                  <label for="numero">Número *</label>
+                  <input type="text" id="numero" placeholder="123">
+               </div>
+               
+               <div class="form-grupo">
+                  <label for="bairro">Bairro *</label>
+                  <input type="text" id="bairro" placeholder="Nome do bairro">
+               </div>
+            </div>
+            
+            <div class="form-grupo">
+               <label for="complemento">Complemento</label>
+               <input type="text" id="complemento" placeholder="Apto, bloco, etc (opcional)">
+            </div>
+            
+            <div class="form-grupo">
+               <label for="referencia">Ponto de referência</label>
+               <textarea id="referencia" rows="2" placeholder="Ex: Próximo ao mercado (opcional)"></textarea>
+            </div>
+         </div>
+         
+         <!-- Seção: Forma de Pagamento -->
+         <div class="form-secao">
+            <h3>Forma de pagamento</h3>
+            <div class="radio-group">
+               <label class="radio-opcao">
+                  <input type="radio" name="formaPagamento" value="pix" id="radioPix">
+                  <span class="radio-custom"></span>
+                  <div class="radio-texto">
+                     <strong>PIX</strong>
+                  </div>
+               </label>
+               
+               <label class="radio-opcao">
+                  <input type="radio" name="formaPagamento" value="debito" id="radioDebito">
+                  <span class="radio-custom"></span>
+                  <div class="radio-texto">
+                     <strong>Cartão de Débito</strong>
+                  </div>
+               </label>
+               
+               <label class="radio-opcao">
+                  <input type="radio" name="formaPagamento" value="credito" id="radioCredito">
+                  <span class="radio-custom"></span>
+                  <div class="radio-texto">
+                     <strong>Cartão de Crédito</strong>
+                  </div>
+               </label>
+               
+               <label class="radio-opcao">
+                  <input type="radio" name="formaPagamento" value="dinheiro" id="radioDinheiro">
+                  <span class="radio-custom"></span>
+                  <div class="radio-texto">
+                     <strong>Dinheiro</strong>
+                  </div>
+               </label>
+            </div>
+         </div>
+         
+         <!-- Seção: Troco (aparece apenas se "Dinheiro" selecionado) -->
+         <div class="form-secao secao-troco" id="secaoTroco" style="display: none;">
+            <h3>Troco</h3>
+            
+            <div class="form-grupo">
+               <label for="valorTroco">Troco para quanto?</label>
+               <input type="number" id="valorTroco" placeholder="Ex: 100.00" step="0.01" min="0">
+            </div>
+            
+            <label class="checkbox-opcao">
+               <input type="checkbox" id="semTroco">
+               <span>Não preciso de troco</span>
+            </label>
+         </div>
+         
+      </div>
+      
+      <!-- Rodapé da etapa 2 -->
+      <div class="formulario-footer">
+         <button class="finalizar-pedido" id="finalizarPedido">
+            Finalizar Pedido
+         </button>
+      </div>
+      
    </div>
    
-   <!-- Rodapé com total e botão de finalizar -->
-   <div class="carrinho-footer">
-      <div class="total-container">
-         <span>Total:</span>
-         <span class="total-valor" id="totalValor">R$ 0,00</span>
-      </div>
-      <button class="finalizar-pedido" id="finalizarPedido">
-         Finalizar Pedido
-      </button>
-   </div>
 </div>
 
 <footer>

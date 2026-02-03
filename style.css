@@ -12,7 +12,6 @@ body{
   
 }
 
-
 /* Cabeçalho */
 
 header{
@@ -110,7 +109,7 @@ li {
    flex-shrink: 0;
 }
 
-/* Seções de conteúdo */
+/* SEÇÕES DE CONTEÚDO */
 
 /* Layout dos produtos */
 .lista-produtos {
@@ -241,6 +240,7 @@ footer{
    display: flex;
    justify-content: center;
    align-items: center;
+   cursor: pointer;
 }
 
 footer a{
@@ -256,8 +256,6 @@ footer img{
    width: 20px;
    height: 20px;
 }
-
-/* MEU CARRINHO */
 
 /* Overlay de fundo escuro */
 .carrinho-overlay {
@@ -484,4 +482,285 @@ footer img{
 .finalizar-pedido:disabled{
    background-color: #ccc;
    cursor: not-allowed;
+}
+
+/* ETAPAS DO PEDIDO */
+.etapa-1, .etapa-2{
+   display: flex;
+   flex-direction: column;
+   height: 100%;
+}
+
+/* BOTÃO VOLTAR */
+.voltar-carrinho{
+   background: none;
+   border: none;
+   font-size: 1.5em;
+   color: #666;
+   cursor: pointer;
+   width: 35px;
+   height: 35px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   border-radius: 50%;
+   transition: background-color 0.2s ease;
+}
+
+.voltar-carrinho:hover{
+   background-color: #f0f0f0;
+}
+
+/* FORMULÁRIO DE ENTREGA */
+.formulario-conteudo{
+   flex: 1;
+   overflow-y: auto;
+   padding: 20px;
+}
+
+/* Resumo do pedido */
+.resumo-pedido{
+   background-color: #f9f9f9;
+   padding: 15px;
+   border-radius: 10px;
+   margin-bottom: 25px;
+}
+
+.resumo-pedido h3{
+   margin: 0 0 10px 0;
+   font-size: 1.1em;
+   color: #333;
+}
+
+.resumo-itens{
+   display: flex;
+   flex-direction: column;
+   gap: 8px;
+   margin-bottom: 10px;
+}
+
+.resumo-item{
+   display: flex;
+   justify-content: space-between;
+   font-size: 0.9em;
+   color: #666;
+}
+
+.resumo-total{
+   display: flex;
+   justify-content: space-between;
+   padding-top: 10px;
+   border-top: 1px solid #ddd;
+   font-size: 1.1em;
+   color: #ff4747;
+}
+
+/* Seções do formulário */
+.form-secao{
+   margin-bottom: 30px;
+}
+
+.form-secao h3{
+   margin: 0 0 15px 0;
+   font-size: 1.1em;
+   color: #333;
+}
+
+/* Raio buttons customizados */
+.radio-group{
+   display: flex;
+   flex-direction: column;
+   gap: 10px
+}
+
+.radio-opcao{
+   display: flex;
+   align-items: center;
+   gap: 15px;
+   padding: 15px;
+   border: 2px solid #e0e0e0;
+   border-radius: 10px;
+   cursor: pointer;
+   transition: all 0.2s ease;
+}
+
+.radio-opcao:hover{
+   border-color: #ff8787;
+   background-color: #fff5f5;
+}
+
+.radio-opcao input[type="radio"]{
+   display: none; /* Esconde o radio button padrão */
+}
+
+.radio-custom{
+   width: 20px;
+   height: 20px;
+   border: 2px solid #ccc;
+   border-radius: 50%;
+   position: relative;
+   flex-shrink: 0;
+   transition: all 0.2s ease;
+}
+
+/* Quando o radio está selecionado */
+.radio-opcao input[type="radio"]:checked ~ .radio-custom{
+   border-color: #ff4747;
+}
+
+.radio-opcao input[type="radio"]:checked ~ .radio-custom::after{
+   content: '';
+   position: absolute;
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+   width: 10px;
+   height: 10px;
+   background-color: #ff4747;
+   border-radius: 50%;
+}
+
+.radio-opcao input[type="radio"]:checked{
+   border-color: #ff4747;
+   background-color: #fff5f5;
+}
+
+.radio-texto{
+   display: flex;
+   flex-direction: column;
+   gap: 2px;
+}
+
+.radio-texto strong {
+   color: #333;
+   font-size: 1em;
+}
+
+.radio-texto small {
+   color: #999;
+   font-size: 0.85em;
+}
+
+/* Inputs de texto */
+.form-grupo {
+   margin-bottom: 15px;
+   flex: 1;
+}
+
+.form-linha {
+   display: flex;
+   gap: 10px;
+}
+
+.form-grupo-pequeno {
+   max-width: 100px;
+}
+
+.form-grupo label {
+   display: block;
+   margin-bottom: 5px;
+   color: #666;
+   font-size: 0.9em;
+   font-weight: 500;
+}
+
+.form-grupo input,
+.form-grupo textarea {
+   width: 100%;
+   padding: 12px;
+   border: 2px solid #e0e0e0;
+   border-radius: 8px;
+   font-size: 1em;
+   font-family: inherit;
+   transition: border-color 0.2s ease;
+   box-sizing: border-box;
+}
+
+.form-grupo input:focus,
+.form-grupo textarea:focus {
+   outline: none;
+   border-color: #ff8787;
+}
+
+/* Input com erro */
+.form-grupo input.erro,
+.form-grupo textarea.erro {
+   border-color: #ff4747;
+   background-color: #fff5f5;
+}
+
+.mensagem-erro {
+   color: #ff4747;
+   font-size: 0.85em;
+   margin-top: 5px;
+}
+
+/* Checkbox */
+.checkbox-opcao {
+   display: flex;
+   align-items: center;
+   gap: 8px;
+   cursor: pointer;
+   margin-top: 10px;
+}
+
+.checkbox-opcao input[type="checkbox"] {
+   width: 18px;
+   height: 18px;
+   cursor: pointer;
+}
+
+.checkbox-opcao span {
+   color: #666;
+   font-size: 0.95em;
+}
+
+/* Rodapé do formulário */
+.formulario-footer {
+   padding: 20px;
+   border-top: 1px solid #eee;
+   background-color: white;
+   flex-shrink: 0;
+}
+
+.continuar-pedido,
+.finalizar-pedido {
+   width: 100%;
+   padding: 15px;
+   background-color: #ff4747;
+   color: white;
+   border: none;
+   border-radius: 8px;
+   font-size: 1.1em;
+   font-weight: bold;
+   cursor: pointer;
+   transition: background-color 0.3s ease;
+}
+
+.continuar-pedido:hover,
+.finalizar-pedido:hover {
+   background-color: #ff2020;
+}
+
+.continuar-pedido:disabled,
+.finalizar-pedido:disabled {
+   background-color: #ccc;
+   cursor: not-allowed;
+}
+
+/* Animação de entrada das seções condicionais */
+.secao-endereco,
+.secao-troco {
+   animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+   from {
+      opacity: 0;
+      transform: translateY(-10px);
+   }
+   to {
+      opacity: 1;
+      transform: translateY(0);
+   }
 }
