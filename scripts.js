@@ -222,10 +222,325 @@ document.addEventListener('DOMContentLoaded', function () {
       }
    });
    
+      // Elementos da etapa 2
+   const etapa1 = document.getElementById('etapa1');
+   const etapa2 = document.getElementById('etapa2');
+   const tituloCarrinho = document.getElementById('tituloCarrinho');
+   const voltarCarrinhoBtn = document.getElementById('voltarCarrinho');
+   const continuarPedidoBtn = document.getElementById('continuarPedido');
+   const finalizarPedidoBtn = document.getElementById('finalizarPedido');
 
+   // Elementos do formulário
+   const radioEntrega = document.getElementById('radioEntrega');
+   const radioRetirada = document.getElementById('radioRetirada');
+   const secaoEndereco = document.getElementById('secaoEndereco');
 
+   const radioPix = document.getElementById('radioPix');
+   const radioDebito = document.getElementById('radioDebito');
+   const radioCredito = document.getElementById('radioCredito');
+   const radioDinheiro = document.getElementById('radioDinheiro');
+   const secaoTroco = document.getElementById('secaoTroco');
+   const semTrocoCheckbox = document.getElementById('semTroco');
+   const valorTrocoInput = document.getElementById('valorTroco');
 
+// FUNÇÃO: IR PARA ETAPA 2
 
+function irParaEtapa2() {
+   // Verifica se o carrinho não está vazio
+   if (carrinho.length === 0) {
+      alert('Adicione produtos no carrinho antes de continuar!');
+      return;
+   }
+   // Esconte etapa 1, mostra etapa 2
+   etapa1.style.display = 'none';
+   etapa2.style.display = 'flex';
 
-   
+   // Muda título
+   tituloCarrinho.textContent = 'Finalizar Pedido';
+
+   // Mostra botão voltar
+   voltarCarrinhoBtn.style.display = 'flex';
+
+   // Atualizar resumo do pedido
+   atualizarResumoPedido();
+
+   // Marca etapa atual
+   etapaAtual = 2;
+}
+
+// FUNÇÃO: VOLTAR PARA ETAPA 1
+function voltarParaEtapa1() {
+   // Esconde etapa 2, mostra etapa 1
+   etapa2.style.display = 'none';
+   etapa1.style.display = 'flex';
+
+   // Muda título
+   tituloCarrinho.textContent = 'Meu Carrinho';
+
+   // Esconde botão voltar
+   voltarCarrinhoBtn.style.display = 'none';
+
+   // Marca etapa atual
+   etapaAtual = 1;
+}
+
+// FUNÇÃO: ATUALIZAR RESUMO DO PEDIDO
+function atualizarResumoPedido() {
+   const resumoItens = document.getElementById('resumoItens');
+   const resumoTotal = document.getElementById('resumoTotal');
+
+   // Limpa resumo
+   resumoItens.innerHTML = '';
+
+   // Adiciona cada item
+   let total = 0;
+   carrinho.forEach(item =>{
+      const subtotal = item.precoNumero * item.quantidade;
+      total += subtotal;
+
+      const itemHTML = `
+         <div class="resumo-item">
+            <span>${item.quantidade}x ${item.nome}</span>
+            <span>R$ ${subtotal.toFixed(2).replace('.', ',')}</span>
+         </div>
+      `;
+      resumoItens.innerHTML += itemHTML;
+   });
+
+   // Atualiza total
+   resumoTotal.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+}
+
+// MOSTRAR/ESCONDER SEÇÃO DE ENDEREÇO
+   radioEntrega.addEventListener('change', function() {
+      if (this.checked) {
+         secaoEndereco.style.display = 'block';
+      }
+   });
+
+   radioRetirada.addEventListener('change', function() {
+      if (this.checked) {
+         secaoEndereco.style.display = 'none';
+         // Limpa campos de endereço quando seleciona retirada
+         limparCamposEndereco();
+      }
+   });
+
+   // MOSTRAR/ESCONDER SEÇÃO DE TROCO
+   radioDinheiro.addEventListener('change', function() {
+      if (this.checked) {
+         secaoTroco.style.display = 'block';
+      }
+}  );
+
+radioPix.addEventListener('change', esconderTroco);
+radioDebito.addEventListener('change', esconderTroco);
+radioCredito.addEventListener('change', esconderTroco);
+
+function esconderTroco() {
+   if (this.checked){
+      secaoTroco.style.display = 'none';
+      valorTrocoInput.value = '';
+      semTrocoCheckbox.checked = false;
+   }
+}
+
+// ========== CHECKBOX "SEM TROCO" ==========
+semTrocoCheckbox.addEventListener('change', function() {
+   if (this.checked) {
+      valorTrocoInput.value = '';
+      valorTrocoInput.disabled = true;
+   } else {
+      valorTrocoInput.disabled = false;
+   }
 });
+
+// ========== FUNÇÃO: LIMPAR CAMPOS DE ENDEREÇO ==========
+function limparCamposEndereco() {
+   document.getElementById('rua').value = '';
+   document.getElementById('numero').value = '';
+   document.getElementById('bairro').value = '';
+   document.getElementById('complemento').value = '';
+   document.getElementById('referencia').value = '';
+}
+
+// ========== FUNÇÃO: VALIDAR FORMULÁRIO ==========
+function validarFormulario() {
+   let valido = true;
+   let mensagensErro = [];
+   
+   // Remove erros anteriores
+   document.querySelectorAll('.erro').forEach(el => el.classList.remove('erro'));
+   document.querySelectorAll('.mensagem-erro').forEach(el => el.remove());
+   
+   // 1. Valida tipo de entrega
+   const tipoEntregaSelecionado = document.querySelector('input[name="tipoEntrega"]:checked');
+   if (!tipoEntregaSelecionado) {
+      mensagensErro.push('Selecione como deseja receber o pedido');
+      valido = false;
+   }
+   
+   // 2. Se entrega, valida endereço
+   if (tipoEntregaSelecionado && tipoEntregaSelecionado.value === 'entrega') {
+      const rua = document.getElementById('rua');
+      const numero = document.getElementById('numero');
+      const bairro = document.getElementById('bairro');
+      
+      if (!rua.value.trim()) {
+         rua.classList.add('erro');
+         mensagensErro.push('Preencha o nome da rua');
+         valido = false;
+      }
+      
+      if (!numero.value.trim()) {
+         numero.classList.add('erro');
+         mensagensErro.push('Preencha o número');
+         valido = false;
+      }
+      
+      if (!bairro.value.trim()) {
+         bairro.classList.add('erro');
+         mensagensErro.push('Preencha o bairro');
+         valido = false;
+      }
+   }
+   
+   // 3. Valida forma de pagamento
+   const formaPagamentoSelecionada = document.querySelector('input[name="formaPagamento"]:checked');
+   if (!formaPagamentoSelecionada) {
+      mensagensErro.push('Selecione a forma de pagamento');
+      valido = false;
+   }
+   
+   // 4. Se dinheiro, valida troco
+   if (formaPagamentoSelecionada && formaPagamentoSelecionada.value === 'dinheiro') {
+      const valorTroco = document.getElementById('valorTroco');
+      const semTroco = document.getElementById('semTroco');
+      
+      if (!semTroco.checked && !valorTroco.value) {
+         valorTroco.classList.add('erro');
+         mensagensErro.push('Informe o valor do troco ou marque "Não preciso de troco"');
+         valido = false;
+      }
+   }
+   
+   // Mostra erros se houver
+   if (!valido) {
+      alert('Por favor, preencha todos os campos obrigatórios:\n\n' + mensagensErro.join('\n'));
+   }
+   
+   return valido;
+}
+
+// ========== FUNÇÃO: COLETAR DADOS DO PEDIDO ==========
+function coletarDadosPedido() {
+   // Tipo de entrega
+   const tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked').value;
+   
+   // Endereço (se for entrega)
+   let endereco = null;
+   if (tipoEntrega === 'entrega') {
+      endereco = {
+         rua: document.getElementById('rua').value.trim(),
+         numero: document.getElementById('numero').value.trim(),
+         bairro: document.getElementById('bairro').value.trim(),
+         complemento: document.getElementById('complemento').value.trim(),
+         referencia: document.getElementById('referencia').value.trim()
+      };
+   }
+   
+   // Forma de pagamento
+   const formaPagamento = document.querySelector('input[name="formaPagamento"]:checked').value;
+   
+   // Troco (se for dinheiro)
+   let troco = null;
+   if (formaPagamento === 'dinheiro') {
+      const semTroco = document.getElementById('semTroco').checked;
+      if (!semTroco) {
+         troco = parseFloat(document.getElementById('valorTroco').value);
+      } else {
+         troco = 'sem troco';
+      }
+   }
+   
+   // Calcula total
+   let total = 0;
+   carrinho.forEach(item => {
+      total += item.precoNumero * item.quantidade;
+   });
+   
+   // Monta objeto completo
+   dadosPedido = {
+      itens: [...carrinho], // Copia array do carrinho
+      total: total,
+      tipoEntrega: tipoEntrega,
+      endereco: endereco,
+      formaPagamento: formaPagamento,
+      troco: troco
+   };
+   
+   return dadosPedido;
+}
+
+// ========== FUNÇÃO: FINALIZAR PEDIDO ==========
+function finalizarPedido() {
+   // Valida formulário
+   if (!validarFormulario()) {
+      return; // Não continua se houver erros
+   }
+   
+   // Coleta dados
+   const pedido = coletarDadosPedido();
+   
+   // Por enquanto, apenas mostra no console
+   console.log('Pedido finalizado:', pedido);
+   
+   // Mostra mensagem de sucesso
+   alert('Pedido registrado com sucesso!\n\nEm breve você será redirecionado para o WhatsApp.');
+   
+   // Aqui no futuro você vai gerar a mensagem do WhatsApp
+   // gerarMensagemWhatsApp(pedido);
+   
+   // Limpa carrinho e fecha
+   carrinho = [];
+   atualizarCarrinho();
+   fecharCarrinho();
+   voltarParaEtapa1();
+   limparFormulario();
+}
+
+// ========== FUNÇÃO: LIMPAR FORMULÁRIO ==========
+function limparFormulario() {
+   // Desmarca radio buttons
+   document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
+   
+   // Limpa inputs
+   document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(input => {
+      input.value = '';
+      input.classList.remove('erro');
+   });
+   
+   // Desmarca checkbox
+   document.getElementById('semTroco').checked = false;
+   
+   // Esconde seções condicionais
+   secaoEndereco.style.display = 'none';
+   secaoTroco.style.display = 'none';
+}
+
+// ========== EVENTOS DOS BOTÕES ==========
+
+// Botão "Continuar" (etapa 1 → etapa 2)
+continuarPedidoBtn.addEventListener('click', irParaEtapa2);
+
+// Botão "Voltar" (etapa 2 → etapa 1)
+voltarCarrinhoBtn.addEventListener('click', voltarParaEtapa1);
+
+// Botão "Finalizar Pedido" (etapa 2)
+finalizarPedidoBtn.addEventListener('click', finalizarPedido);
+
+
+
+
+
+})
