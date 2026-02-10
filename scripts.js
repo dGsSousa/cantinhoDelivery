@@ -1,5 +1,4 @@
 // ========== VARIÁVEIS GLOBAIS ==========
-let carrinho = [];
 let etapaAtual = 1; // Controla em qual etapa está
 let dadosPedido = {
    itens: [],
@@ -10,8 +9,146 @@ let dadosPedido = {
    troco: null
 };
 
+// ========== CONFIGURAÇÃO DA API ==========
+const API_URL = 'https://script.google.com/macros/s/AKfycbxB1NiaxCyZOVzJx2PRgFTbHTOzZuVvDo9Pn6TiDX7v3eDlozt3u-V4-bImCKMkjGSk7w/exec';
+
+// ========== VARIÁVEIS GLOBAIS ==========
+let carrinho = [];
+let produtos = []; // Array que armazenará os produtos da API
+let categorias = []; // Array que armazenará as categorias
+
+// ========== FUNÇÃO: BUSCAR DADOS DA API ==========
+async function buscarDados() {
+   try {
+      console.log('Buscando dados da API...');
+      console.log('URL:', API_URL);
+      
+      // Faz requisição para a API
+      const resposta = await fetch(API_URL);
+      
+      console.log('Status da resposta:', resposta.status);
+      console.log('Resposta OK?', resposta.ok);
+      
+      // Converte resposta para JSON
+      const dados = await resposta.json();
+      
+      console.log('Dados recebidos:', dados);
+      
+      // Verifica se deu sucesso
+      if (dados.sucesso) {
+         produtos = dados.dados.produtos || [];
+         categorias = dados.dados.categorias || [];
+         
+         console.log(`${produtos.length} produtos carregados`);
+         console.log('Produtos:', produtos);
+         console.log(`${categorias.length} categorias carregadas`);
+         
+         // Verifica se tem produtos
+         if (produtos.length === 0) {
+            console.warn('⚠️ ATENÇÃO: Nenhum produto foi retornado pela API!');
+            console.warn('Verifique se a planilha tem dados e se a coluna "ativo" está como TRUE');
+            alert('Nenhum produto encontrado na planilha. Verifique os dados no Google Sheets.');
+            return false;
+         }
+         
+         return true;
+      } else {
+         throw new Error('API retornou sucesso=false');
+      }
+      
+   } catch (erro) {
+      console.error('❌ Erro ao buscar dados:', erro);
+      console.error('Detalhes:', erro.message);
+      alert('Erro ao carregar produtos. Verifique o console (F12) para mais detalhes.');
+      return false;
+   }
+}
+
+// ========== FUNÇÃO: RENDERIZAR PRODUTOS POR CATEGORIA ==========
+function renderizarProdutos() {
+   console.log('Renderizando produtos...');
+   
+   // Para cada categoria única nos produtos
+   const categoriasUnicas = [...new Set(produtos.map(p => p.categoria))];
+   
+   categoriasUnicas.forEach(categoria => {
+      // Busca o container dessa categoria
+      const container = document.getElementById(`lista-${categoria}`);
+      
+      if (!container) {
+         console.warn(`Container não encontrado para categoria: ${categoria}`);
+         return;
+      }
+      
+      // Limpa mensagem de carregamento
+      container.innerHTML = '';
+      
+      // Filtra produtos dessa categoria
+      const produtosCategoria = produtos.filter(p => p.categoria === categoria);
+      
+      // Para cada produto, cria o HTML
+      produtosCategoria.forEach(produto => {
+         const produtoHTML = criarCardProduto(produto);
+         container.innerHTML += produtoHTML;
+      });
+   });
+   
+   console.log('Produtos renderizados!');
+}
+
+// ========== FUNÇÃO: CRIAR HTML DO CARD DO PRODUTO ==========
+function criarCardProduto(produto) {
+   // Define o texto do preço
+   let textoPreco;
+   let textoBotao;
+   
+   if (produto.tipo === 'tamanhos') {
+      // Produto com tamanhos (pizza)
+      textoPreco = `A partir de R$ ${produto.preco_p.toFixed(2).replace('.', ',')}`;
+      textoBotao = 'Escolher Tamanho';
+   } else {
+      // Produto com preço único
+      textoPreco = `R$ ${produto.preco_unico.toFixed(2).replace('.', ',')}`;
+      textoBotao = 'Adicionar ao Carrinho';
+   }
+   
+   // Retorna HTML do card
+   return `
+      <div class="produto" 
+           data-id="${produto.id}"
+           data-nome="${produto.nome}"
+           data-descricao="${produto.descricao}"
+           data-img="${produto.img}"
+           data-tipo="${produto.tipo}"
+           data-preco-p="${produto.preco_p || ''}"
+           data-preco-m="${produto.preco_m || ''}"
+           data-preco-g="${produto.preco_g || ''}"
+           data-preco-unico="${produto.preco_unico || ''}">
+         
+         <img src="images/${produto.img}" alt="${produto.nome}">
+         <h3>${produto.nome}</h3>
+         <p>${produto.descricao}</p>
+         <span class="preco">${textoPreco}</span>
+         <button class="adicionar-carrinho">${textoBotao}</button>
+      </div>
+   `;
+}
+
 // ========== AGUARDA CARREGAMENTO DA PÁGINA ==========
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
+
+   console.log('Página carregada, iniciando script...');
+   
+   // Busca dados da API
+   const dadosCarregados = await buscarDados();
+
+   if (dadosCarregados) {
+      console.error('Falha ao carregar dados');
+      return;
+   }
+
+   // Renderiza produtos na página
+   renderizarProdutos();
    
    // ========== INICIALIZA ELEMENTOS DO DOM ==========
    const carrinhoPainel = document.getElementById('carrinhoPainel');
