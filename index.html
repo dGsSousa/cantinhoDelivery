@@ -61,13 +61,13 @@
       </section>
 
       <section class="secoes" id="pizzas-salgadas" style="display: none;">
-         <div class="lista-produtos" id="lista-pizzas-salgadas">
+         <div class="lista-produtos" id="lista-pizza-salgada">
             <p class="carregando">Carregando produtos...</p>
          </div>
       </section>
 
       <section class="secoes" id="pizzas-doces" style="display: none;">
-         <div class="lista-produtos" id="lista-pizzas-doces">
+         <div class="lista-produtos" id="lista-pizza-doce">
             <p class="carregando">Carregando produtos...</p>
          </div>
       </section>
@@ -325,6 +325,38 @@
 <footer>
    <a href="#carrinho">(0) Meu Carrinho <img src="icons/carrinho-icon.png" alt="icone de um carrinho de compras"></a>
 </footer>
+
+<!-- Modal de detalhes do produto -->
+ <div class="modal-overlay" id="modalOverlay"></div>
+
+ <div class="modal-tamanhos" id="modalTamanhos">
+   <button class="modal-fechar" id="modalFechar">x</button>
+
+   <img src="" alt="" id="modalImg" class="modal-img">
+   <h3 id="modalNome">Nome do produto</h3>
+   <p class="modal-descricao" id="modalDescricao">Descrição do produto</p>
+
+   <h4 class="modal-titulo-tamanhos">Escolha o tamanho:</h4>
+
+   <div class="modal-tamanho-opcoes" id="modalTamanhosOpcoes">
+      <button class="btn-tamanho" data-tamanho="P">
+         <span class="tamanho-letra">P</span>
+         <span class="tamanho-preco" id="precoP">R$ 0,00</span>
+      </button>
+
+      <button class="btn-tamanho" data-tamanho="M">
+         <span class="tamanho-letra">M</span>
+         <span class="tamanho-preco" id="precoM">R$ 0,00</span>
+      </button>
+
+      <button class="btn-tamanho" data-tamanho="G">
+         <span class="tamanho-letra">G</span>
+         <span class="tamanho-preco" id="precoG">R$ 0,00</span>
+      </button>
+   </div>
+
+   <button class="modal-adicionar" id="modalAdicionar">Adicionar ao Carrinho</button>
+</div>
 
 </body>
 

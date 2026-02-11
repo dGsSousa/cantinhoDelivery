@@ -19,7 +19,7 @@ header{
    align-items: center;
    flex-direction: column;
    position: sticky;
-   top: -100px;
+   top: 0px;
    z-index: 100;
    background-color: white;
    
@@ -787,4 +787,185 @@ footer img{
    padding: 40px 20px;
    color: #999;
    font-size: 1em;
+}
+
+/* ========== MODAL DE TAMANHOS ========== */
+
+/* Overlay do modal */
+.modal-overlay {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background-color: rgba(0, 0, 0, 0.5);
+   opacity: 0;
+   visibility: hidden;
+   transition: opacity 0.3s ease, visibility 0.3s ease;
+   z-index: 1000;
+}
+
+.modal-overlay.ativo {
+   opacity: 1;
+   visibility: visible;
+}
+
+/* Container do modal */
+.modal-tamanhos {
+   position: fixed;
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -50%) scale(0.8);
+   background-color: white;
+   border-radius: 15px;
+   padding: 25px;
+   max-width: 400px;
+   width: 90%;
+   max-height: 90vh;
+   overflow-y: auto;
+   opacity: 0;
+   visibility: hidden;
+   transition: all 0.3s ease;
+   z-index: 1001;
+   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal-tamanhos.ativo {
+   opacity: 1;
+   visibility: visible;
+   transform: translate(-50%, -50%) scale(1);
+}
+
+/* Botão fechar (X) */
+.modal-fechar {
+   position: absolute;
+   top: 15px;
+   right: 15px;
+   background: none;
+   border: none;
+   font-size: 1.5em;
+   color: #999;
+   cursor: pointer;
+   width: 35px;
+   height: 35px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   border-radius: 50%;
+   transition: background-color 0.2s ease;
+}
+
+.modal-fechar:hover {
+   background-color: #f0f0f0;
+}
+
+/* Imagem do produto */
+.modal-img {
+   width: 100%;
+   height: 200px;
+   object-fit: cover;
+   border-radius: 10px;
+   margin-bottom: 15px;
+}
+
+/* Nome do produto */
+.modal-tamanhos h3 {
+   margin: 0 0 10px 0;
+   font-size: 1.4em;
+   color: #333;
+}
+
+/* Descrição */
+.modal-descricao {
+   margin: 0 0 20px 0;
+   color: #666;
+   font-size: 0.95em;
+   line-height: 1.4;
+}
+
+/* Título "Escolha o tamanho" */
+.modal-titulo-tamanhos {
+   margin: 0 0 15px 0;
+   font-size: 1.1em;
+   color: #333;
+   font-weight: 500;
+}
+
+/* Container dos botões de tamanho */
+.modal-tamanhos-opcoes {
+   display: flex;
+   gap: 10px;
+   margin-bottom: 20px;
+}
+
+/* Botões de tamanho */
+.btn-tamanho {
+   flex: 1;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   padding: 15px 10px;
+   border: 2px solid #e0e0e0;
+   background-color: white;
+   border-radius: 10px;
+   cursor: pointer;
+   transition: all 0.2s ease;
+}
+
+.btn-tamanho:hover {
+   border-color: #ff8787;
+   background-color: #fff5f5;
+}
+
+.btn-tamanho.selecionado {
+   border-color: #ff4747;
+   background-color: #fff5f5;
+   box-shadow: 0 0 0 2px rgba(255, 71, 71, 0.2);
+}
+
+/* Letra do tamanho (P, M, G) */
+.tamanho-letra {
+   font-size: 1.5em;
+   font-weight: bold;
+   color: #333;
+   margin-bottom: 5px;
+}
+
+.btn-tamanho.selecionado .tamanho-letra {
+   color: #ff4747;
+}
+
+/* Preço do tamanho */
+.tamanho-preco {
+   font-size: 0.9em;
+   color: #666;
+}
+
+.btn-tamanho.selecionado .tamanho-preco {
+   color: #ff4747;
+   font-weight: 600;
+}
+
+/* Botão adicionar ao carrinho */
+.modal-adicionar {
+   width: 100%;
+   padding: 15px;
+   background-color: #ff4747;
+   color: white;
+   border: none;
+   border-radius: 10px;
+   font-size: 1.1em;
+   font-weight: 600;
+   cursor: pointer;
+   transition: background-color 0.3s ease;
+}
+
+.modal-adicionar:hover {
+   background-color: #ff2020;
+}
+
+.modal-adicionar:disabled {
+   background-color: #ccc;
+   cursor: not-allowed;
 }
