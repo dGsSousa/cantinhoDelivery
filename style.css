@@ -18,9 +18,6 @@ header{
    display: flex;
    align-items: center;
    flex-direction: column;
-   position: sticky;
-   top: 0px;
-   z-index: 100;
    background-color: white;
    
 }
@@ -31,7 +28,7 @@ header img{
 }
 
 header h1{
-   margin: 20px 40px;
+   margin: 10px 40px;
    text-align: left;
    font-weight: 400;
    font-size: 1.7em;
@@ -43,14 +40,26 @@ header h1{
    line-height: 1.3;
 }
 
-header input{
-   background-color: rgb(224, 224, 224);
-   width: 90%;
+.barra-pesquisa{
+   position: sticky;
+   top: 0;
+   z-index: 100;
+   background-color: rgb(255, 255, 255);
+   padding: 0px 5%;
+   border-bottom: 1px solid white;
+   box-sizing: border-box;
+}
+
+.barra-pesquisa input {
+   width: 100%;
    height: 50px;
-   border-radius: 5px;
+   background-color: rgb(224, 224, 224);
    border: none;
+   border-radius: 5px;
    padding: 0 20px;
    font-size: .8em;
+   box-sizing: border-box;
+   display: block;
 }
 
 input::placeholder {
@@ -71,10 +80,10 @@ input:focus, textarea:focus {
    scrollbar-width: none; /* Firefox */
    -ms-overflow-style: none; /* IE e Edge */
    position: sticky;
-   top: 150px;
+   top: 50px;
    z-index: 99;
    background-color: white;
-   padding-bottom: 10px;
+   padding: 10px 2%;
 }
 
 .opcoes::-webkit-scrollbar {
@@ -85,7 +94,7 @@ input:focus, textarea:focus {
    display: flex;
    justify-content: flex-start; /* Alinha itens à esquerda */
    flex-wrap: nowrap;
-   margin-top: 20px;
+
 }
 
 li {
