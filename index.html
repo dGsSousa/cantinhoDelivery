@@ -8,7 +8,13 @@
 </head>
 
 <header>
-   <img src="images/logo-cantinho.png" alt="logo do cantinho dos sabores">
+   <div class="header-logo-status">
+      <img src="images/logo-cantinho.png" alt="logo do cantinho dos sabores">
+      <div id="statusLoja" class="status-loja status-fechado">
+         <span class="status-bolinha"></span>
+         <span class="status-texto">Fechado no momento</span>
+      </div>
+   </div>
 </header>
 
 <div class="topo-fixo">
@@ -40,11 +46,6 @@
 
 <body>
    <main>
-
-      <!-- Menu Horizontal -->
-
-      
-
       <!-- Seções de conteúdo -->
 
       <!-- MENU PRINCIPAL -->
@@ -210,6 +211,14 @@
          <div class="resumo-pedido">
             <h3>Resumo do Pedido</h3>
             <div class="resumo-itens" id="resumoItens"></div>
+            <div class="resumo-linha">
+               <span>Subtotal</span>
+               <span id="resumoSubtotal">R$ 0,00</span>
+            </div>
+            <div class="resumo-linha">
+               <span>Entrega</span>
+               <span id="resumoFrete">Grátis</span>
+            </div>
             <div class="resumo-total">
                <strong>Total:</strong>
                <strong id="resumoTotal">R$ 0,00</strong>
@@ -243,6 +252,13 @@
          <!-- Seção: Endereço (aparece apenas se "Entrega" selecionado) -->
          <div class="form-secao secao-endereco" id="secaoEndereco" style="display: none;">
             <h3>Endereço de entrega</h3>
+
+            <div class="form-grupo">
+               <label for="selectBairro">Bairro *</label>
+               <select id="selectBairro" class="select-bairro">
+                  <option value="">Carregando bairros...</option>
+               </select>
+            </div>
             
             <div class="form-grupo">
                <label for="rua">Rua *</label>
