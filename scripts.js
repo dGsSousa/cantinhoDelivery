@@ -137,7 +137,7 @@ function verificarStatusLoja() {
       console.warn('[Status]   1. Apps Script nao foi reimplantado como nova versao');
       console.warn('[Status]   2. Aba da planilha nao se chama exatamente "Horarios"');
       console.warn('[Status]   3. A funcao lerAba() nao esta no seu Apps Script');
-      return { aberto: false, texto: 'Fechado no momento' };
+      return { aberto: false, texto: 'Fechado' };
    }
 
    // Procura o registro do dia de hoje
@@ -156,7 +156,7 @@ function verificarStatusLoja() {
       console.warn('[Status] PROBLEMA: nenhum registro encontrado para o dia:', diaAtualNorm);
       console.warn('[Status] Valores de "dia" na planilha:',
                    horarios.map(function(h) { return '"' + h.dia + '" -> "' + normalizarTexto(h.dia) + '"'; }));
-      return { aberto: false, texto: 'Fechado no momento' };
+      return { aberto: false, texto: 'Fechado' };
    }
 
    console.log('[Status] registro encontrado:', JSON.stringify(horarioDia));
@@ -169,12 +169,12 @@ function verificarStatusLoja() {
 
    if (minutosAbertura === null || minutosFechamento === null) {
       console.warn('[Status] PROBLEMA: formato de hora invalido. Use HH:MM (ex: 08:00, 22:30)');
-      return { aberto: false, texto: 'Fechado no momento' };
+      return { aberto: false, texto: 'Fechado' };
    }
 
    var estaAberto = minutosAgora >= minutosAbertura && minutosAgora < minutosFechamento;
    console.log('[Status] resultado:', estaAberto ? 'ABERTO' : 'FECHADO');
-   return { aberto: estaAberto, texto: estaAberto ? 'Aberto agora' : 'Fechado no momento' };
+   return { aberto: estaAberto, texto: estaAberto ? 'Aberto' : 'Fechado' };
 }
 
 function renderizarStatusLoja() {
