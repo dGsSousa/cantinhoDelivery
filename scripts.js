@@ -375,24 +375,28 @@ document.addEventListener('DOMContentLoaded', function () {
    }
 
    // Event Listeners
-   menuLinks.forEach(function(link) {
-      link.addEventListener('click', function(e) {
-         e.preventDefault();
-         var secaoId = this.getAttribute('href').substring(1);
-         document.querySelectorAll('.secoes').forEach(function(s) { s.style.display = 'none'; });
-         var secao = document.getElementById(secaoId); if (secao) secao.style.display = 'block';
-         menuLinks.forEach(function(l) { l.classList.remove('ativo'); }); this.classList.add('ativo');
-      });
+   document.querySelectorAll('.categoria-link').forEach(link => {
+   link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const secaoId = this.getAttribute('href').substring(1);
+      document.querySelectorAll('.secao').forEach(s => s.style.display = 'none');
+      const secao = document.getElementById(secaoId);
+      if (secao) secao.style.display = 'block';
+      document.querySelectorAll('.categoria-link').forEach(l => l.classList.remove('ativo'));
+      this.classList.add('ativo');
    });
+});
 
-   document.querySelectorAll('.subcategorias a').forEach(function(link) {
-      link.addEventListener('click', function(e) {
-         e.preventDefault();
-         var produtoId = this.getAttribute('href').substring(1);
-         document.querySelectorAll('.secoes').forEach(function(s) { s.style.display = 'none'; });
-         var secao = document.getElementById(produtoId); if (secao) secao.style.display = 'block';
-      });
+// Subcategorias - Simplificada
+document.querySelectorAll('.subcategoria-card').forEach(link => {
+   link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const produtoId = this.getAttribute('href').substring(1);
+      document.querySelectorAll('.secao').forEach(s => s.style.display = 'none');
+      const secao = document.getElementById(produtoId);
+      if (secao) secao.style.display = 'block';
    });
+});
 
    footerCarrinho.addEventListener('click', function(e) { e.preventDefault(); abrirCarrinho(); });
    fecharCarrinhoBtn.addEventListener('click', fecharCarrinho);
