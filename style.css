@@ -466,6 +466,9 @@ footer img {
    border-top: 1px solid #eee;
    background-color: white;
    flex-shrink: 0;
+   position: sticky;
+   bottom: 0;
+   z-index: 10;
 }
 
 .total-container {
@@ -718,6 +721,9 @@ footer img {
    border-top: 1px solid #eee;
    background-color: white;
    flex-shrink: 0;
+   position: sticky;
+   bottom: 0;
+   z-index: 10;
 }
 
 /* Animação fade in */
