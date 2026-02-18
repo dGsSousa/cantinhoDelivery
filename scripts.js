@@ -41,16 +41,47 @@ function criarCardProduto(produto) {
    const precoM     = produto.preco_m     && produto.preco_m     !== "" ? Number(produto.preco_m)     : null;
    const precoG     = produto.preco_g     && produto.preco_g     !== "" ? Number(produto.preco_g)     : null;
    const precoUnico = produto.preco_unico && produto.preco_unico !== "" ? Number(produto.preco_unico) : null;
+   
    let textoPreco, textoBotao;
+   
    if (produto.tipo === 'tamanhos') {
-      textoPreco = precoP ? 'A partir de R$ ' + precoP.toFixed(2).replace('.', ',') : 'Preco nao disponivel';
-      textoBotao = 'Escolher Tamanho';
+      textoPreco = precoP ? 'A partir de R$ ' + precoP.toFixed(2).replace('.', ',') : 'Preço não disponível';
+      textoBotao = '+';
    } else {
-      textoPreco = precoUnico ? 'R$ ' + precoUnico.toFixed(2).replace('.', ',') : 'Preco nao disponivel';
-      textoBotao = 'Adicionar ao Carrinho';
+      textoPreco = precoUnico ? 'R$ ' + precoUnico.toFixed(2).replace('.', ',') : 'Preço não disponível';
+      textoBotao = '+';
    }
+   
    const urlImagem = processarURLImagem(produto.img);
-   return '<div class="produto" data-id="' + produto.id + '" data-nome="' + produto.nome + '" data-descricao="' + produto.descricao + '" data-img="' + produto.img + '" data-tipo="' + produto.tipo + '" data-preco-p="' + (precoP||'') + '" data-preco-m="' + (precoM||'') + '" data-preco-g="' + (precoG||'') + '" data-preco-unico="' + (precoUnico||'') + '"><img src="' + urlImagem + '" alt="' + produto.nome + '" onerror="this.src=\'images/placeholder.jpg\'"><h3>' + produto.nome + '</h3><p>' + produto.descricao + '</p><span class="preco">' + textoPreco + '</span><button class="adicionar-carrinho">' + textoBotao + '</button></div>';
+   
+   // ========== HTML DO CARD ==========
+   return '<div class="produto" ' +
+          'data-id="' + produto.id + '" ' +
+          'data-nome="' + produto.nome + '" ' +
+          'data-descricao="' + produto.descricao + '" ' +
+          'data-img="' + produto.img + '" ' +
+          'data-tipo="' + produto.tipo + '" ' +
+          'data-preco-p="' + (precoP || '') + '" ' +
+          'data-preco-m="' + (precoM || '') + '" ' +
+          'data-preco-g="' + (precoG || '') + '" ' +
+          'data-preco-unico="' + (precoUnico || '') + '">' +
+          
+          '<img src="' + urlImagem + '" alt="' + produto.nome + '" onerror="this.src=\'images/placeholder.jpg\'">' +
+          
+          '<div class="produto-info">' +
+             '<div>' +
+                '<h3>' + produto.nome + '</h3>' +
+                '<p>' + produto.descricao + '</p>' +
+             '</div>' +
+             '<div class="produto-footer">' +
+                '<span class="preco">' + textoPreco + '</span>' +
+                '<button class="adicionar-carrinho" aria-label="Adicionar ' + produto.nome + ' ao carrinho">' +
+                   textoBotao +
+                '</button>' +
+             '</div>' +
+          '</div>' +
+          
+          '</div>';
 }
 
 function processarURLImagem(img) {
@@ -434,8 +465,8 @@ document.querySelectorAll('.subcategoria-card').forEach(link => {
          if (existente) existente.quantidade++;
          else carrinho.push(produto);
          atualizarCarrinho();
-         e.target.textContent = 'Adicionado!'; e.target.style.backgroundColor = '#4CAF50';
-         setTimeout(function() { e.target.textContent = 'Adicionar ao Carrinho'; e.target.style.backgroundColor = '#ff4747'; }, 1000);
+         e.target.style.backgroundColor = '#4CAF50';
+         setTimeout(function() { e.target.style.backgroundColor = '#ff4747'; }, 1000);
       }
       if (e.target.classList.contains('btn-quantidade')) {
          var id = parseInt(e.target.dataset.id); var item = carrinho.find(function(i) { return i.id === id; }); if (!item) return;

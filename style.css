@@ -155,56 +155,111 @@ textarea:focus {
 .lista-produtos {
    display: flex;
    flex-direction: column;
-   gap: 15px;
+   gap: 12px;
    padding: 20px;
 }
 
 .produto {
    background-color: white;
    border-radius: 10px;
-   padding: 15px;
-   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+   padding: 12px;
+   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
    display: flex;
-   flex-direction: column;
-   gap: 10px;
+   flex-direction: row;
+   gap: 12px;
+   align-items: stretch;
+   transition: box-shadow 0.2s ease;
+}
+
+.produto:active {
+   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
 }
 
 .produto img {
-   width: 100%;
-   height: 150px;
+   width: 90px;
+   height: 90px;
    object-fit: cover;
    border-radius: 8px;
+   flex-shrink: 0;
+}
+
+.produto-info{
+   flex: 1;
+   display: flex;
+   flex-direction: column;
+   justify-content: space-between;
+   min-width: 0;
 }
 
 .produto h3 {
-   font-size: 1.2em;
+   font-size: 1.05em;
+   font-weight: 600;
    color: #333;
+   margin: 0;
+   line-height: 1.3;
+   display: -webkit-box;
+   -webkit-line-clamp: 2;
+   line-clamp: 2;
+   -webkit-box-orient: vertical;
+   overflow: hidden;
 }
 
 .produto p {
-   font-size: 0.9em;
-   color: #666;
+   font-size: 0.8em; /* Reduzido de 0.9em */
+   color: #888; /* Cor mais suave */
+   margin: 4px 0 0 0;
+   line-height: 1.4;
+   overflow: hidden;
+}
+
+.produto-footer{
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   margin-top: 8px;
+   gap: 8px;
 }
 
 .produto .preco {
-   font-size: 1.3em;
+   font-size: 1em;
    color: #ff4747;
-   font-weight: bold;
+   font-weight: 700;
+   margin: 0;
 }
 
 .produto .adicionar-carrinho {
    background-color: #ff4747;
    color: white;
    border: none;
-   padding: 12px;
-   border-radius: 5px;
-   font-size: 1em;
+   width: 36px; /* Tamanho fixo circular */
+   height: 36px;
+   border-radius: 50%; /* ← Formato circular */
+   font-size: 1.3em;
+   font-weight: 300;
    cursor: pointer;
-   transition: background-color 0.3s ease;
+   transition: all 0.2s ease;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   flex-shrink: 0; /* Impede que botão diminua */
+   box-shadow: 0 2px 6px rgba(255, 71, 71, 0.3);
 }
 
 .produto .adicionar-carrinho:hover {
    background-color: #ff2020;
+   transform: scale(1.08); /* Efeito de crescimento ao hover */
+   box-shadow: 0 3px 10px rgba(255, 71, 71, 0.4);
+}
+
+.produto .adicionar-carrinho:active {
+   transform: scale(0.95); /* Efeito de clique */
+}
+
+.carregando {
+   text-align: center;
+   padding: 40px 20px;
+   color: #999;
+   font-size: 1em;
 }
 
 /* ========== SUBCATEGORIAS ========== */
