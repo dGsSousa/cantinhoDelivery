@@ -161,13 +161,12 @@ textarea:focus {
 
 .produto {
    background-color: white;
-   border-radius: 10px;
+   border-radius: 12px;
    padding: 12px;
-   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
    display: flex;
-   flex-direction: row;
-   gap: 12px;
-   align-items: stretch;
+   flex-direction: column;
+   gap: 10px;
    transition: box-shadow 0.2s ease;
 }
 
@@ -175,19 +174,26 @@ textarea:focus {
    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
 }
 
+.produto-topo{
+   display: flex;
+   flex-direction: row;
+   gap: 12px;
+   align-items: flex-start;
+}
+
 .produto img {
-   width: 90px;
-   height: 90px;
+   width: 80px;
+   height: 80px;
    object-fit: cover;
    border-radius: 8px;
    flex-shrink: 0;
 }
 
-.produto-info{
-   flex: 1;
+.produto-texto{
    display: flex;
    flex-direction: column;
-   justify-content: space-between;
+   gap: 4px;
+   flex: 1;
    min-width: 0;
 }
 
@@ -207,21 +213,21 @@ textarea:focus {
 .produto p {
    font-size: 0.8em; /* Reduzido de 0.9em */
    color: #888; /* Cor mais suave */
-   margin: 4px 0 0 0;
+   margin: 0;
    line-height: 1.4;
    overflow: hidden;
 }
 
-.produto-footer{
+.produto-rodape{
    display: flex;
+   flex-direction: row;
    justify-content: space-between;
    align-items: center;
-   margin-top: 8px;
-   gap: 8px;
+   gap: 12px;
 }
 
 .produto .preco {
-   font-size: 1em;
+   font-size: 1.3em;
    color: #ff4747;
    font-weight: 700;
    margin: 0;
@@ -253,6 +259,13 @@ textarea:focus {
 
 .produto .adicionar-carrinho:active {
    transform: scale(0.95); /* Efeito de clique */
+}
+
+.lista-produtos{
+   display: flex;
+   flex-direction: column;
+   gap: 12px;
+   padding: 20px; 
 }
 
 .carregando {

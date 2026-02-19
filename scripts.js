@@ -66,19 +66,21 @@ function criarCardProduto(produto) {
           'data-preco-g="' + (precoG || '') + '" ' +
           'data-preco-unico="' + (precoUnico || '') + '">' +
           
-          '<img src="' + urlImagem + '" alt="' + produto.nome + '" onerror="this.src=\'images/placeholder.jpg\'">' +
-          
-          '<div class="produto-info">' +
-             '<div>' +
+          // SEÇÃO SUPERIOR: Imagem + Texto
+          '<div class="produto-topo">' +
+             '<img src="' + urlImagem + '" alt="' + produto.nome + '" class="produto-img" onerror="this.src=\'images/placeholder.jpg\'">' +
+             '<div class="produto-texto">' +
                 '<h3>' + produto.nome + '</h3>' +
                 '<p>' + produto.descricao + '</p>' +
              '</div>' +
-             '<div class="produto-footer">' +
-                '<span class="preco">' + textoPreco + '</span>' +
-                '<button class="adicionar-carrinho" aria-label="Adicionar ' + produto.nome + ' ao carrinho">' +
-                   textoBotao +
-                '</button>' +
-             '</div>' +
+          '</div>' +
+          
+          // SEÇÃO INFERIOR: Preço + Botão
+          '<div class="produto-rodape">' +
+             '<span class="preco">' + textoPreco + '</span>' +
+             '<button class="adicionar-carrinho" aria-label="Adicionar ' + produto.nome + ' ao carrinho">' +
+                textoBotao +
+             '</button>' +
           '</div>' +
           
           '</div>';
@@ -155,21 +157,6 @@ function verificarStatusLoja() {
    var agora = new Date();
    var minutosAgora = agora.getHours() * 60 + agora.getMinutes();
    var diaAtualNorm = diasNormalizados[agora.getDay()];
-
-   // Logs para diagnostico - abra o console do navegador (F12) para ver
-   console.log('[Status] horarios da API:', JSON.stringify(horarios));
-   console.log('[Status] dia atual normalizado:', diaAtualNorm);
-   console.log('[Status] hora atual em minutos:', minutosAgora,
-               '= ' + agora.getHours() + ':' + String(agora.getMinutes()).padStart(2, '0'));
-
-   if (!horarios || horarios.length === 0) {
-      console.warn('[Status] PROBLEMA: array horarios esta vazio.');
-      console.warn('[Status] Causas possiveis:');
-      console.warn('[Status]   1. Apps Script nao foi reimplantado como nova versao');
-      console.warn('[Status]   2. Aba da planilha nao se chama exatamente "Horarios"');
-      console.warn('[Status]   3. A funcao lerAba() nao esta no seu Apps Script');
-      return { aberto: false, texto: 'Fechado' };
-   }
 
    // Procura o registro do dia de hoje
    // normalizarTexto() no campo 'dia' da planilha garante tolerancia a:
