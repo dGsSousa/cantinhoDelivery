@@ -396,10 +396,27 @@ document.addEventListener('DOMContentLoaded', function () {
    document.querySelectorAll('.categoria-link').forEach(link => {
    link.addEventListener('click', function(e) {
       e.preventDefault();
+
       const secaoId = this.getAttribute('href').substring(1);
+
       document.querySelectorAll('.secao').forEach(s => s.style.display = 'none');
+
       const secao = document.getElementById(secaoId);
-      if (secao) secao.style.display = 'block';
+      if (secao) {
+         secao.style.display = 'block';
+         
+         // ========== RESET DE SCROLL ==========
+         // Força o scroll da página principal para o topo
+         window.scrollTo({ top: 0, behavior: 'smooth' });
+         
+         // Se a seção tiver uma lista de produtos com scroll próprio, reseta também
+         const listaContainer = secao.querySelector('.lista-produtos');
+         if (listaContainer) {
+            listaContainer.scrollTop = 0; // Reset vertical
+            listaContainer.scrollLeft = 0; // Reset horizontal (se houver)
+         }
+      }
+
       document.querySelectorAll('.categoria-link').forEach(l => l.classList.remove('ativo'));
       this.classList.add('ativo');
    });
@@ -409,10 +426,26 @@ document.addEventListener('DOMContentLoaded', function () {
 document.querySelectorAll('.subcategoria-card').forEach(link => {
    link.addEventListener('click', function(e) {
       e.preventDefault();
+
       const produtoId = this.getAttribute('href').substring(1);
+
       document.querySelectorAll('.secao').forEach(s => s.style.display = 'none');
+
       const secao = document.getElementById(produtoId);
-      if (secao) secao.style.display = 'block';
+      if (secao) {
+         secao.style.display = 'block';
+         
+         // ========== RESET DE SCROLL ==========
+         // Força o scroll da página principal para o topo
+         window.scrollTo({ top: 0, behavior: 'smooth' });
+         
+         // Se a seção tiver uma lista de produtos com scroll próprio, reseta também
+         const listaContainer = secao.querySelector('.lista-produtos');
+         if (listaContainer) {
+            listaContainer.scrollTop = 0; // Reset vertical
+            listaContainer.scrollLeft = 0; // Reset horizontal (se houver)
+         }
+      }
    });
 });
 
