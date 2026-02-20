@@ -22,35 +22,22 @@
 <div class="topo-fixo">
    <h1>O que você quer</h1>
    <h2>pedir hoje?</h2>
-   
-   <input type="text" maxlength="30" id="pesquisar" placeholder="Pesquisar produto">
+
+   <div class="pesquisa-container">
+      <input type="text" maxlength="30" id="pesquisar" placeholder="Pesquisar produto" autocomplete="off">
+      <button class="limpar-pesquisa" id="limparPesquisa" style="display: none;">✕</button>
+   </div>
    
    <!-- Menu de categorias -->
    <nav class="opcoes">
-      <a href="#pizza" class="categoria-link ativo">
-         <img src="icons/pizza-icon.png" alt="Pizza">
-      </a>
-      <a href="#hamburguer" class="categoria-link">
-         <img src="icons/hamburguer-icon.png" alt="Hambúrguer">
-      </a>
-      <a href="#sushi" class="categoria-link">
-         <img src="icons/sushi-icon.png" alt="Sushi">
-      </a>
-      <a href="#yakisoba" class="categoria-link">
-         <img src="icons/yakisoba-icon.png" alt="Yakisoba">
-      </a>
-      <a href="#porcoes" class="categoria-link">
-         <img src="icons/porcoes-icon.png" alt="Porções">
-      </a>
-      <a href="#combos" class="categoria-link">
-         <img src="icons/combos-icon.png" alt="Combos">
-      </a>
-      <a href="#combinados" class="categoria-link">
-         <img src="icons/combinados-icon.png" alt="Combinados">
-      </a>
-      <a href="#bebidas" class="categoria-link">
-         <img src="icons/bebidas-icon.png" alt="Bebidas">
-      </a>
+      <a href="#pizza" class="categoria-link ativo"><img src="icons/pizza-icon.png" alt="Pizza"></a>
+      <a href="#hamburguer" class="categoria-link"><img src="icons/hamburguer-icon.png" alt="Hambúrguer"></a>
+      <a href="#sushi" class="categoria-link"><img src="icons/sushi-icon.png" alt="Sushi"></a>
+      <a href="#yakisoba" class="categoria-link"><img src="icons/yakisoba-icon.png" alt="Yakisoba"></a>
+      <a href="#porcoes" class="categoria-link"><img src="icons/porcoes-icon.png" alt="Porções"></a>
+      <a href="#combos" class="categoria-link"><img src="icons/combos-icon.png" alt="Combos"></a>
+      <a href="#combinados" class="categoria-link"><img src="icons/combinados-icon.png" alt="Combinados"></a>
+      <a href="#bebidas" class="categoria-link"><img src="icons/bebidas-icon.png" alt="Bebidas"></a>
    </nav>
 </div>
 
@@ -71,21 +58,19 @@
       </div>
    </section>
 
-   <!-- Pizzas Salgadas - Produtos -->
    <section class="secao" id="pizzas-salgadas" style="display: none;">
       <div class="lista-produtos" id="lista-pizza-salgada">
          <p class="carregando">Carregando produtos...</p>
       </div>
    </section>
 
-   <!-- Pizzas Doces - Produtos -->
    <section class="secao" id="pizzas-doces" style="display: none;">
       <div class="lista-produtos" id="lista-pizza-doce">
          <p class="carregando">Carregando produtos...</p>
       </div>
    </section>
 
-   <!-- Hambúrguer - Produtos diretos -->
+   <!-- Hambúrguer -->
    <section class="secao" id="hamburguer" style="display: none;">
       <div class="lista-produtos" id="lista-hamburguer">
          <p class="carregando">Carregando produtos...</p>
@@ -95,109 +80,49 @@
    <!-- Sushi - Subcategorias -->
    <section class="secao" id="sushi" style="display: none;">
       <div class="subcategorias">
-         <a href="#temaki" class="subcategoria-card">
-            <img src="images/sushi1.jpg" alt="Temaki">
-            <span>Temaki</span>
-         </a>
-         <a href="#duplas" class="subcategoria-card">
-            <img src="images/sushi2.jpg" alt="Sushi">
-            <span>Duplas</span>
-         </a>
-         <a href="#makimono" class="subcategoria-card">
-            <img src="images/sushi2.jpg" alt="Makimono">
-            <span>Makimono</span>
-         </a>
-         <a href="#harumaki" class="subcategoria-card">
-            <img src="images/sushi2.jpg" alt="Harumaki">
-            <span>Harumaki</span>
-         </a>
+         <a href="#temaki" class="subcategoria-card"><img src="images/sushi1.jpg" alt="Temaki"><span>Temaki</span></a>
+         <a href="#duplas" class="subcategoria-card"><img src="images/sushi2.jpg" alt="Duplas"><span>Duplas</span></a>
+         <a href="#makimono" class="subcategoria-card"><img src="images/sushi2.jpg" alt="Makimono"><span>Makimono</span></a>
+         <a href="#harumaki" class="subcategoria-card"><img src="images/sushi2.jpg" alt="Harumaki"><span>Harumaki</span></a>
       </div>
    </section>
 
-   <!-- Temaki - Produtos -->
-   <section class="secao" id="temaki" style="display: none;">
-      <div class="lista-produtos" id="lista-temaki">
-         <p class="carregando">Carregando produtos...</p>
-      </div>
-   </section>
-   <!-- Duplas - Produtos -->
-   <section class="secao" id="duplas" style="display: none;">
-      <div class="lista-produtos" id="lista-sushi">
-         <p class="carregando">Carregando produtos...</p>
-      </div>
-   </section>
-   <!-- Makimono - Produtos -->
-   <section class="secao" id="makimono" style="display: none;">
-      <div class="lista-produtos" id="lista-makimono">
-         <p class="carregando">Carregando produtos...</p>
-      </div>
-   </section>
-   <!-- Harumaki - Produtos -->
-   <section class="secao" id="harumaki" style="display: none;">
-      <div class="lista-produtos" id="lista-harumaki">
-         <p class="carregando">Carregando produtos...</p>
-      </div>
-   </section>
+   <section class="secao" id="temaki" style="display: none;"><div class="lista-produtos" id="lista-temaki"><p class="carregando">Carregando...</p></div></section>
+   <section class="secao" id="duplas" style="display: none;"><div class="lista-produtos" id="lista-sushi"><p class="carregando">Carregando...</p></div></section>
+   <section class="secao" id="makimono" style="display: none;"><div class="lista-produtos" id="lista-makimono"><p class="carregando">Carregando...</p></div></section>
+   <section class="secao" id="harumaki" style="display: none;"><div class="lista-produtos" id="lista-harumaki"><p class="carregando">Carregando...</p></div></section>
 
-   <!-- Yakisoba - Produtos diretos -->
-   <section class="secao" id="yakisoba" style="display: none;">
-      <div class="lista-produtos" id="lista-yakisoba">
-         <p class="carregando">Carregando produtos...</p>
-      </div>
-   </section>
+   <!-- Outras categorias -->
+   <section class="secao" id="yakisoba" style="display: none;"><div class="lista-produtos" id="lista-yakisoba"><p class="carregando">Carregando...</p></div></section>
+   <section class="secao" id="porcoes" style="display: none;"><div class="lista-produtos" id="lista-porcoes"><p class="carregando">Carregando...</p></div></section>
+   <section class="secao" id="combos" style="display: none;"><div class="lista-produtos" id="lista-combos"><p class="carregando">Carregando...</p></div></section>
+   <section class="secao" id="combinados" style="display: none;"><div class="lista-produtos" id="lista-combinados"><p class="carregando">Carregando...</p></div></section>
+   <section class="secao" id="bebidas" style="display: none;"><div class="lista-produtos" id="lista-bebidas"><p class="carregando">Carregando...</p></div></section>
 
-   <!-- Porções - Produtos diretos -->
-   <section class="secao" id="porcoes" style="display: none;">
-      <div class="lista-produtos" id="lista-porcoes">
-         <p class="carregando">Carregando produtos...</p>
+   <!-- ========== NOVO: CONTAINER DE PESQUISA GLOBAL ========== -->
+   <section class="secao-pesquisa-global" id="resultadosPesquisaGlobal" style="display: none;">
+      <div class="pesquisa-global-header">
+         <h2>Resultados da busca</h2>
+         <p class="pesquisa-global-termo"></p>
       </div>
-   </section>
-
-   <!-- Combos - Produtos diretos -->
-   <section class="secao" id="combos" style="display: none;">
-      <div class="lista-produtos" id="lista-combos">
-         <p class="carregando">Carregando produtos...</p>
-      </div>
-   </section>
-
-   <!-- Combinados - Produtos diretos -->
-   <section class="secao" id="combinados" style="display: none;">
-      <div class="lista-produtos" id="lista-combinados">
-         <p class="carregando">Carregando produtos...</p>
-      </div>
-   </section>
-
-   <!-- Bebidas - Produtos diretos -->
-   <section class="secao" id="bebidas" style="display: none;">
-      <div class="lista-produtos" id="lista-bebidas">
-         <p class="carregando">Carregando produtos...</p>
-      </div>
+      <div class="lista-produtos" id="listaPesquisaGlobal"></div>
    </section>
 
 </main>
 
 <!-- ========== FOOTER CARRINHO ========== -->
-<footer>
-   <a href="#carrinho">
-      (0) Meu Carrinho 
-      <img src="icons/carrinho-icon.png" alt="Carrinho">
-   </a>
-</footer>
+<footer><a href="#carrinho">(0) Meu Carrinho <img src="icons/carrinho-icon.png" alt="Carrinho"></a></footer>
 
-<!-- ========== OVERLAY CARRINHO ========== -->
+<!-- ========== OVERLAY E PAINEL CARRINHO ========== -->
 <div class="carrinho-overlay" id="carrinhoOverlay"></div>
-
-<!-- ========== PAINEL CARRINHO ========== -->
 <div class="carrinho-painel" id="carrinhoPainel">
-   
-   <!-- Header -->
    <div class="carrinho-header">
       <button class="voltar-carrinho" id="voltarCarrinho" style="display: none;">←</button>
       <h2 id="tituloCarrinho">Meu Carrinho</h2>
       <button class="fechar-carrinho" id="fecharCarrinho">✕</button>
    </div>
 
-   <!-- ETAPA 1: Produtos -->
+   <!-- ETAPA 1 -->
    <div class="etapa-1" id="etapa1">
       <div class="carrinho-conteudo">
          <div class="carrinho-vazio" id="carrinhoVazio">
@@ -206,7 +131,6 @@
          </div>
          <div class="carrinho-itens" id="carrinhoItens"></div>
       </div>
-      
       <div class="carrinho-footer">
          <div class="total-container">
             <span>Total:</span>
@@ -216,117 +140,60 @@
       </div>
    </div>
 
-   <!-- ETAPA 2: Formulário -->
+   <!-- ETAPA 2 -->
    <div class="etapa-2" id="etapa2" style="display: none;">
       <div class="formulario-conteudo">
-         
-         <!-- Resumo -->
          <div class="resumo-pedido">
             <h3>Resumo do Pedido</h3>
             <div class="resumo-itens" id="resumoItens"></div>
-            <div class="resumo-linha">
-               <span>Subtotal</span>
-               <span id="resumoSubtotal">R$ 0,00</span>
-            </div>
-            <div class="resumo-linha">
-               <span>Entrega</span>
-               <span id="resumoFrete">Grátis</span>
-            </div>
-            <div class="resumo-total">
-               <strong>Total:</strong>
-               <strong id="resumoTotal">R$ 0,00</strong>
-            </div>
+            <div class="resumo-linha"><span>Subtotal</span><span id="resumoSubtotal">R$ 0,00</span></div>
+            <div class="resumo-linha"><span>Entrega</span><span id="resumoFrete">Grátis</span></div>
+            <div class="resumo-total"><strong>Total:</strong><strong id="resumoTotal">R$ 0,00</strong></div>
          </div>
          
-         <!-- Tipo de Entrega -->
          <div class="form-secao">
             <h3>Como deseja receber?</h3>
             <label class="radio-opcao">
                <input type="radio" name="tipoEntrega" value="entrega" id="radioEntrega">
                <span class="radio-custom"></span>
-               <div class="radio-texto">
-                  <strong>Entrega no endereço</strong>
-                  <small>Receba em casa</small>
-               </div>
+               <div class="radio-texto"><strong>Entrega no endereço</strong><small>Receba em casa</small></div>
             </label>
             <label class="radio-opcao">
                <input type="radio" name="tipoEntrega" value="retirada" id="radioRetirada">
                <span class="radio-custom"></span>
-               <div class="radio-texto">
-                  <strong>Retirar no local</strong>
-                  <small>Buscar pessoalmente</small>
-               </div>
+               <div class="radio-texto"><strong>Retirar no local</strong><small>Buscar pessoalmente</small></div>
             </label>
          </div>
          
-         <!-- Endereço -->
          <div class="form-secao secao-endereco" id="secaoEndereco" style="display: none;">
             <h3>Endereço de entrega</h3>
             <div class="form-grupo">
                <label for="selectBairro">Bairro *</label>
-               <select id="selectBairro" class="select-bairro">
-                  <option value="">Carregando bairros...</option>
-               </select>
+               <select id="selectBairro" class="select-bairro"><option value="">Carregando bairros...</option></select>
             </div>
-            <div class="form-grupo">
-               <label for="rua">Rua *</label>
-               <input type="text" id="rua" placeholder="Nome da rua">
-            </div>
-            <div class="form-grupo">
-               <label for="nomePessoa">Nome de quem vai receber *</label>
-               <input type="text" id="nomePessoa" placeholder="Nome">
-            </div>
-            <div class="form-grupo">
-               <label for="referencia">Ponto de referência</label>
-               <textarea id="referencia" rows="2" placeholder="Ex: Próximo ao mercado (opcional)"></textarea>
-            </div>
+            <div class="form-grupo"><label for="rua">Rua *</label><input type="text" id="rua" placeholder="Nome da rua"></div>
+            <div class="form-grupo"><label for="nomePessoa">Nome de quem vai receber *</label><input type="text" id="nomePessoa" placeholder="Nome"></div>
+            <div class="form-grupo"><label for="referencia">Ponto de referência</label><textarea id="referencia" rows="2" placeholder="Ex: Próximo ao mercado (opcional)"></textarea></div>
          </div>
          
-         <!-- Pagamento -->
          <div class="form-secao">
             <h3>Forma de pagamento</h3>
-            <label class="radio-opcao">
-               <input type="radio" name="formaPagamento" value="pix" id="radioPix">
-               <span class="radio-custom"></span>
-               <strong>PIX</strong>
-            </label>
-            <label class="radio-opcao">
-               <input type="radio" name="formaPagamento" value="debito" id="radioDebito">
-               <span class="radio-custom"></span>
-               <strong>Cartão de Débito</strong>
-            </label>
-            <label class="radio-opcao">
-               <input type="radio" name="formaPagamento" value="credito" id="radioCredito">
-               <span class="radio-custom"></span>
-               <strong>Cartão de Crédito</strong>
-            </label>
-            <label class="radio-opcao">
-               <input type="radio" name="formaPagamento" value="dinheiro" id="radioDinheiro">
-               <span class="radio-custom"></span>
-               <strong>Dinheiro</strong>
-            </label>
+            <label class="radio-opcao"><input type="radio" name="formaPagamento" value="pix" id="radioPix"><span class="radio-custom"></span><strong>PIX</strong></label>
+            <label class="radio-opcao"><input type="radio" name="formaPagamento" value="debito" id="radioDebito"><span class="radio-custom"></span><strong>Cartão de Débito</strong></label>
+            <label class="radio-opcao"><input type="radio" name="formaPagamento" value="credito" id="radioCredito"><span class="radio-custom"></span><strong>Cartão de Crédito</strong></label>
+            <label class="radio-opcao"><input type="radio" name="formaPagamento" value="dinheiro" id="radioDinheiro"><span class="radio-custom"></span><strong>Dinheiro</strong></label>
          </div>
          
-         <!-- Troco -->
          <div class="form-secao secao-troco" id="secaoTroco" style="display: none;">
             <h3>Troco</h3>
-            <div class="form-grupo">
-               <label for="valorTroco">Troco para quanto?</label>
-               <input type="number" id="valorTroco" placeholder="Ex: 100.00" step="0.01" min="0">
-            </div>
-            <label class="checkbox-opcao">
-               <input type="checkbox" id="semTroco">
-               <span>Não preciso de troco</span>
-            </label>
+            <div class="form-grupo"><label for="valorTroco">Troco para quanto?</label><input type="number" id="valorTroco" placeholder="Ex: 100.00" step="0.01" min="0"></div>
+            <label class="checkbox-opcao"><input type="checkbox" id="semTroco"><span>Não preciso de troco</span></label>
          </div>
-         
       </div>
-      
       <div class="formulario-footer">
          <button class="finalizar-pedido" id="finalizarPedido">Finalizar Pedido</button>
       </div>
    </div>
-   
 </div>
 
 <!-- ========== MODAL TAMANHOS ========== -->
@@ -338,18 +205,9 @@
    <p class="modal-descricao" id="modalDescricao">Descrição do produto</p>
    <h4 class="modal-titulo-tamanhos">Escolha o tamanho:</h4>
    <div class="modal-tamanho-opcoes">
-      <button class="btn-tamanho" data-tamanho="P">
-         <span class="tamanho-letra">P</span>
-         <span class="tamanho-preco" id="precoP">R$ 0,00</span>
-      </button>
-      <button class="btn-tamanho" data-tamanho="M">
-         <span class="tamanho-letra">M</span>
-         <span class="tamanho-preco" id="precoM">R$ 0,00</span>
-      </button>
-      <button class="btn-tamanho" data-tamanho="G">
-         <span class="tamanho-letra">G</span>
-         <span class="tamanho-preco" id="precoG">R$ 0,00</span>
-      </button>
+      <button class="btn-tamanho" data-tamanho="P"><span class="tamanho-letra">P</span><span class="tamanho-preco" id="precoP">R$ 0,00</span></button>
+      <button class="btn-tamanho" data-tamanho="M"><span class="tamanho-letra">M</span><span class="tamanho-preco" id="precoM">R$ 0,00</span></button>
+      <button class="btn-tamanho" data-tamanho="G"><span class="tamanho-letra">G</span><span class="tamanho-preco" id="precoG">R$ 0,00</span></button>
    </div>
    <button class="modal-adicionar" id="modalAdicionar">Adicionar ao Carrinho</button>
 </div>

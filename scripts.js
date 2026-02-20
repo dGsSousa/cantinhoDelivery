@@ -7,6 +7,9 @@ let horarios = [];
 let taxaEntregaSelecionada = 0;
 let etapaAtual = 1;
 let dadosPedido = { itens: [], total: 0, tipoEntrega: null, endereco: null, formaPagamento: null, troco: null };
+let produtosFiltrados = [];
+let termoPesquisa = '';
+let categoriaAtiva = null;
 
 const API_URL = 'https://script.google.com/macros/s/AKfycbxUMmAJEGSOlKBf_n950M4RD-op6vRlgcgqj_ktkjY0bct8ASIysE3DSXhXI9mm48esgg/exec';
 
@@ -204,6 +207,88 @@ function renderizarStatusLoja() {
    statusEl.querySelector('.status-texto').textContent = status.texto;
 }
 
+// ========== FUNÇÃO: NORMALIZAR TEXTO (Remove acentos e converte para lowercase) ==========
+function normalizarTextoParaPesquisa(texto) {
+   if (!texto) return '';
+   return texto.toString()
+      .toLowerCase() // CAFÉ → café
+      .normalize('NFD') // Decompõe caracteres acentuados
+      .replace(/[\u0300-\u036f]/g, '') // Remove marcas de acento
+      .trim(); // Remove espaços das pontas
+}
+
+// ========== FUNÇÃO: FILTRAR PRODUTOS ==========
+function filtrarProdutos(termo, categoria = null) {
+   // Normaliza o termo de busca
+   const termoNormalizado = normalizarTextoParaPesquisa(termo);
+   
+   // Se não há termo de busca
+   if (!termoNormalizado) {
+      // Se há categoria ativa, retorna produtos da categoria
+      if (categoria) {
+         return produtos.filter(p => p.categoria === categoria);
+      }
+      // Se não há categoria, retorna todos os produtos
+      return produtos;
+   }
+   
+   // Filtra produtos
+   return produtos.filter(produto => {
+      // Se há categoria ativa, filtra apenas produtos dessa categoria
+      if (categoria && produto.categoria !== categoria) {
+         return false;
+      }
+      
+      // Normaliza nome e descrição do produto
+      const nomeNormalizado = normalizarTextoParaPesquisa(produto.nome);
+      const descricaoNormalizada = normalizarTextoParaPesquisa(produto.descricao);
+      
+      // Verifica se o termo está no nome OU na descrição
+      return nomeNormalizado.includes(termoNormalizado) || 
+             descricaoNormalizada.includes(termoNormalizado);
+   });
+}
+
+// ========== FUNÇÃO: RENDERIZAR PRODUTOS COM PESQUISA ==========
+function renderizarProdutosComPesquisa() {
+   // Filtra produtos
+   produtosFiltrados = filtrarProdutos(termoPesquisa, categoriaAtiva);
+   
+   // Pega o container ativo
+   let containerAtivo;
+   if (categoriaAtiva) {
+      containerAtivo = document.getElementById(`lista-${categoriaAtiva}`);
+   } else {
+      // Se não há categoria ativa, usa o primeiro visível
+      const secaoVisivel = document.querySelector('.secao[style*="display: block"]');
+      if (secaoVisivel) {
+         containerAtivo = secaoVisivel.querySelector('.lista-produtos');
+      }
+   }
+   
+   if (!containerAtivo) return;
+   
+   // Limpa container
+   containerAtivo.innerHTML = '';
+   
+   // Se nenhum produto encontrado
+   if (produtosFiltrados.length === 0) {
+      containerAtivo.innerHTML = `
+         <div class="pesquisa-vazia">
+            <div class="pesquisa-vazia-icone">🔍</div>
+            <h3>Ops! Nenhum produto encontrado</h3>
+            <p>Tente buscar por outro termo ou explore nossas categorias</p>
+         </div>
+      `;
+      return;
+   }
+   
+   // Renderiza produtos filtrados
+   produtosFiltrados.forEach(produto => {
+      containerAtivo.innerHTML += criarCardProduto(produto);
+   });
+}
+
 // ============================================================
 // SELETOR DE BAIRRO E TAXA DE FRETE
 // ============================================================
@@ -273,10 +358,99 @@ document.addEventListener('DOMContentLoaded', function () {
    var semTrocoCheckbox   = document.getElementById('semTroco');
    var valorTrocoInput    = document.getElementById('valorTroco');
    var selectBairro       = document.getElementById('selectBairro');
-
    var produtoAtual       = null;
    var tamanhoSelecionado = null;
 
+      // ========== ELEMENTOS DA PESQUISA ==========
+   const inputPesquisa = document.getElementById('pesquisar');
+   const btnLimparPesquisa = document.getElementById('limparPesquisa');
+   
+   // ========== EVENT LISTENER: INPUT DE PESQUISA (Tempo Real) ==========
+   /**
+    * Dispara a cada tecla digitada (tempo real).
+    * 
+    * Fluxo:
+    * 1. Captura o texto digitado
+    * 2. Mostra/esconde botão de limpar
+    * 3. Atualiza termo de pesquisa global
+    * 4. Re-renderiza produtos filtrados
+    */
+   inputPesquisa.addEventListener('input', function(e) {
+      termoPesquisa = e.target.value;
+      
+      // Mostra botão X se há texto
+      if (termoPesquisa.length > 0) {
+         btnLimparPesquisa.style.display = 'flex';
+      } else {
+         btnLimparPesquisa.style.display = 'none';
+      }
+      
+      // Re-renderiza produtos com filtro
+      renderizarProdutosComPesquisa();
+   });
+   
+   // ========== EVENT LISTENER: BOTÃO LIMPAR (X) ==========
+   /**
+    * Limpa a pesquisa e restaura todos os produtos.
+    */
+   btnLimparPesquisa.addEventListener('click', function() {
+      inputPesquisa.value = '';
+      termoPesquisa = '';
+      btnLimparPesquisa.style.display = 'none';
+      
+      // Re-renderiza produtos (todos)
+      renderizarProdutosComPesquisa();
+      
+      // Foca no input para continuar digitando
+      inputPesquisa.focus();
+   });
+   
+   // ========== EVENT LISTENER: CATEGORIAS (Atualizado com integração de pesquisa) ==========
+   document.querySelectorAll('.categoria-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+         e.preventDefault();
+         
+         const secaoId = this.getAttribute('href').substring(1);
+         
+         // Atualiza categoria ativa
+         categoriaAtiva = secaoId;
+         
+         // Esconde todas as seções
+         document.querySelectorAll('.secao').forEach(s => s.style.display = 'none');
+         
+         // Mostra a seção clicada
+         const secao = document.getElementById(secaoId);
+         if (secao) {
+            secao.style.display = 'block';
+            
+            // Reset de scroll
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            const listaContainer = secao.querySelector('.lista-produtos');
+            if (listaContainer) {
+               listaContainer.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+            }
+            
+            // ========== INTEGRAÇÃO COM PESQUISA ==========
+            // Se há termo de pesquisa ativo, filtra na nova categoria
+            if (termoPesquisa) {
+               renderizarProdutosComPesquisa();
+            } else {
+               // Caso contrário, renderiza produtos normais da categoria
+               listaContainer.innerHTML = '';
+               produtos.filter(p => p.categoria === secaoId).forEach(produto => {
+                  listaContainer.innerHTML += criarCardProduto(produto);
+               });
+            }
+         }
+         
+         // Atualiza indicador visual
+         document.querySelectorAll('.categoria-link').forEach(l => l.classList.remove('ativo'));
+         this.classList.add('ativo');
+      });
+   });
+
+
+   // ========== CARRINHO ==========
    function abrirCarrinho() { carrinhoPainel.classList.add('aberto'); carrinhoOverlay.classList.add('ativo'); document.body.style.overflow = 'hidden'; }
    function fecharCarrinho() { carrinhoPainel.classList.remove('aberto'); carrinhoOverlay.classList.remove('ativo'); document.body.style.overflow = ''; }
 
