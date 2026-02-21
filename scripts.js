@@ -1,31 +1,32 @@
 // ========== VARIAVEIS GLOBAIS ==========
 let carrinho = [];
 let produtos = [];
-let categorias = [];
 let bairros = [];
 let horarios = [];
 let taxaEntregaSelecionada = 0;
-let etapaAtual = 1;
-let dadosPedido = { itens: [], total: 0, tipoEntrega: null, endereco: null, formaPagamento: null, troco: null };
-let produtosFiltrados = [];
-let termoPesquisa = '';
-let categoriaAtiva = null;
+let dadosPedido = {};
+let termoPesquisaGlobal = '';
+let modoPesquisaGlobal = false;
 
 const API_URL = 'https://script.google.com/macros/s/AKfycbxUMmAJEGSOlKBf_n950M4RD-op6vRlgcgqj_ktkjY0bct8ASIysE3DSXhXI9mm48esgg/exec';
 
+// ========== FUNÇÕES DE API ==========
 async function buscarDados() {
    try {
       const resposta = await fetch(API_URL);
       const dados = await resposta.json();
       if (dados.sucesso) {
-         produtos   = dados.dados.produtos   || [];
-         categorias = dados.dados.categorias || [];
-         bairros    = dados.dados.bairros    || [];
-         horarios   = dados.dados.horarios   || [];
-         if (produtos.length === 0) { alert('Nenhum produto encontrado na planilha.'); return false; }
+         produtos = dados.dados.produtos || [];
+         bairros = dados.dados.bairros || [];
+         horarios = dados.dados.horarios || [];
+         if (produtos.length === 0) { alert('Nenhum produto encontrado.'); return false; }
          return true;
-      } else { throw new Error('API retornou sucesso=false'); }
-   } catch (erro) { alert('Erro ao carregar produtos. Verifique sua conexao.'); return false; }
+      }
+      throw new Error('API retornou erro');
+   } catch (erro) {
+      alert('Erro ao carregar produtos.');
+      return false;
+   }
 }
 
 function renderizarProdutos() {
@@ -34,59 +35,31 @@ function renderizarProdutos() {
       const container = document.getElementById('lista-' + categoria);
       if (!container) return;
       container.innerHTML = '';
-      produtos.filter(p => p.categoria === categoria).forEach(produto => { container.innerHTML += criarCardProduto(produto); });
+      produtos.filter(p => p.categoria === categoria).forEach(p => {
+         container.innerHTML += criarCardProduto(p);
+      });
    });
    document.querySelectorAll('.carregando').forEach(el => el.remove());
 }
 
 function criarCardProduto(produto) {
-   const precoP     = produto.preco_p     && produto.preco_p     !== "" ? Number(produto.preco_p)     : null;
-   const precoM     = produto.preco_m     && produto.preco_m     !== "" ? Number(produto.preco_m)     : null;
-   const precoG     = produto.preco_g     && produto.preco_g     !== "" ? Number(produto.preco_g)     : null;
+   const precoP = produto.preco_p && produto.preco_p !== "" ? Number(produto.preco_p) : null;
+   const precoM = produto.preco_m && produto.preco_m !== "" ? Number(produto.preco_m) : null;
+   const precoG = produto.preco_g && produto.preco_g !== "" ? Number(produto.preco_g) : null;
    const precoUnico = produto.preco_unico && produto.preco_unico !== "" ? Number(produto.preco_unico) : null;
    
    let textoPreco, textoBotao;
-   
    if (produto.tipo === 'tamanhos') {
-      textoPreco = precoP ? 'A partir de R$ ' + precoP.toFixed(2).replace('.', ',') : 'Preço não disponível';
+      textoPreco = precoP ? 'A partir de R$ ' + precoP.toFixed(2).replace('.', ',') : 'Preço indisponível';
       textoBotao = '+';
    } else {
-      textoPreco = precoUnico ? 'R$ ' + precoUnico.toFixed(2).replace('.', ',') : 'Preço não disponível';
+      textoPreco = precoUnico ? 'R$ ' + precoUnico.toFixed(2).replace('.', ',') : 'Preço indisponível';
       textoBotao = '+';
    }
    
    const urlImagem = processarURLImagem(produto.img);
    
-   // ========== HTML DO CARD ==========
-   return '<div class="produto" ' +
-          'data-id="' + produto.id + '" ' +
-          'data-nome="' + produto.nome + '" ' +
-          'data-descricao="' + produto.descricao + '" ' +
-          'data-img="' + produto.img + '" ' +
-          'data-tipo="' + produto.tipo + '" ' +
-          'data-preco-p="' + (precoP || '') + '" ' +
-          'data-preco-m="' + (precoM || '') + '" ' +
-          'data-preco-g="' + (precoG || '') + '" ' +
-          'data-preco-unico="' + (precoUnico || '') + '">' +
-          
-          // SEÇÃO SUPERIOR: Imagem + Texto
-          '<div class="produto-topo">' +
-             '<img src="' + urlImagem + '" alt="' + produto.nome + '" class="produto-img" onerror="this.src=\'images/placeholder.jpg\'">' +
-             '<div class="produto-texto">' +
-                '<h3>' + produto.nome + '</h3>' +
-                '<p>' + produto.descricao + '</p>' +
-             '</div>' +
-          '</div>' +
-          
-          // SEÇÃO INFERIOR: Preço + Botão
-          '<div class="produto-rodape">' +
-             '<span class="preco">' + textoPreco + '</span>' +
-             '<button class="adicionar-carrinho" aria-label="Adicionar ' + produto.nome + ' ao carrinho">' +
-                textoBotao +
-             '</button>' +
-          '</div>' +
-          
-          '</div>';
+   return '<div class="produto" data-id="' + produto.id + '" data-nome="' + produto.nome + '" data-descricao="' + produto.descricao + '" data-img="' + produto.img + '" data-tipo="' + produto.tipo + '" data-preco-p="' + (precoP || '') + '" data-preco-m="' + (precoM || '') + '" data-preco-g="' + (precoG || '') + '" data-preco-unico="' + (precoUnico || '') + '"><div class="produto-topo"><img src="' + urlImagem + '" alt="' + produto.nome + '" class="produto-img" onerror="this.src=\'images/placeholder.jpg\'"><div class="produto-texto"><h3>' + produto.nome + '</h3><p>' + produto.descricao + '</p></div></div><div class="produto-rodape"><span class="preco">' + textoPreco + '</span><button class="adicionar-carrinho" aria-label="Adicionar ao carrinho">'+textoBotao+'</button></div></div>';
 }
 
 function processarURLImagem(img) {
@@ -102,28 +75,12 @@ function processarURLImagem(img) {
    return 'images/' + img;
 }
 
-// ============================================================
-// SISTEMA DE STATUS ABERTO / FECHADO
-// ============================================================
-
-/*
- * Remove acentos e converte para lowercase para comparacao tolerante.
- * "Segunda-feira" -> "segunda-feira"
- * "Terca-feira"   -> "terca-feira"
- * Isso permite que o usuario escreva qualquer variacao na planilha.
- */
+// ========== FUNÇÕES DE STATUS ==========
 function normalizarTexto(str) {
    if (!str) return '';
-   return str.toString().toLowerCase().trim()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '');
+   return str.toString().toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
-/*
- * Converte "HH:MM" em total de minutos desde meia-noite.
- * "08:00" -> 480  |  "22:30" -> 1350
- * Usar numeros inteiros torna a comparacao simples e sem bugs.
- */
 function horaParaMinutos(horaStr) {
    if (!horaStr) return null;
    const str = horaStr.toString().trim();
@@ -135,575 +92,354 @@ function horaParaMinutos(horaStr) {
    return h * 60 + m;
 }
 
-/*
- * Verifica se a loja esta aberta agora.
- *
- * Fluxo:
- *   1. Pega o dia da semana atual e normaliza (sem acentos, lowercase)
- *   2. Busca no array 'horarios' um registro cujo campo 'dia' normalize igual
- *   3. Converte abertura/fechamento para minutos e compara com hora atual
- *
- * Retorna: { aberto: boolean, texto: string }
- */
 function verificarStatusLoja() {
-   // Nomes normalizados dos dias (sem acentos, lowercase) para comparacao
-   var diasNormalizados = [
-      'domingo',
-      'segunda-feira',
-      'terca-feira',
-      'quarta-feira',
-      'quinta-feira',
-      'sexta-feira',
-      'sabado'
-   ];
-
-   var agora = new Date();
-   var minutosAgora = agora.getHours() * 60 + agora.getMinutes();
-   var diaAtualNorm = diasNormalizados[agora.getDay()];
-
-   // Procura o registro do dia de hoje
-   // normalizarTexto() no campo 'dia' da planilha garante tolerancia a:
-   //   maiusculas, acentos, espacos, abreviacoes
-   var horarioDia = null;
-   for (var i = 0; i < horarios.length; i++) {
-      var h = horarios[i];
-      if (!h.dia) continue;
-      var diaNorm = normalizarTexto(h.dia);
-      console.log('[Status] comparando "' + diaNorm + '" com "' + diaAtualNorm + '"');
-      if (diaNorm === diaAtualNorm) { horarioDia = h; break; }
-   }
-
-   if (!horarioDia) {
-      console.warn('[Status] PROBLEMA: nenhum registro encontrado para o dia:', diaAtualNorm);
-      console.warn('[Status] Valores de "dia" na planilha:',
-                   horarios.map(function(h) { return '"' + h.dia + '" -> "' + normalizarTexto(h.dia) + '"'; }));
-      return { aberto: false, texto: 'Fechado' };
-   }
-
-   console.log('[Status] registro encontrado:', JSON.stringify(horarioDia));
-
-   var minutosAbertura   = horaParaMinutos(horarioDia.abertura);
-   var minutosFechamento = horaParaMinutos(horarioDia.fechamento);
-
-   console.log('[Status] abertura:', horarioDia.abertura, '->', minutosAbertura, 'min');
-   console.log('[Status] fechamento:', horarioDia.fechamento, '->', minutosFechamento, 'min');
-
-   if (minutosAbertura === null || minutosFechamento === null) {
-      console.warn('[Status] PROBLEMA: formato de hora invalido. Use HH:MM (ex: 08:00, 22:30)');
-      return { aberto: false, texto: 'Fechado' };
-   }
-
-   var estaAberto = minutosAgora >= minutosAbertura && minutosAgora < minutosFechamento;
-   console.log('[Status] resultado:', estaAberto ? 'ABERTO' : 'FECHADO');
+   const diasNormalizados = ['domingo', 'segunda-feira', 'terca-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sabado'];
+   const agora = new Date();
+   const minutosAgora = agora.getHours() * 60 + agora.getMinutes();
+   const diaAtualNorm = diasNormalizados[agora.getDay()];
+   
+   const horarioDia = horarios.find(h => normalizarTexto(h.dia) === diaAtualNorm);
+   if (!horarioDia) return { aberto: false, texto: 'Fechado' };
+   
+   const minutosAbertura = horaParaMinutos(horarioDia.abertura);
+   const minutosFechamento = horaParaMinutos(horarioDia.fechamento);
+   
+   if (minutosAbertura === null || minutosFechamento === null) return { aberto: false, texto: 'Fechado' };
+   
+   const estaAberto = minutosAgora >= minutosAbertura && minutosAgora < minutosFechamento;
    return { aberto: estaAberto, texto: estaAberto ? 'Aberto' : 'Fechado' };
 }
 
 function renderizarStatusLoja() {
-   var statusEl = document.getElementById('statusLoja');
+   const statusEl = document.getElementById('statusLoja');
    if (!statusEl) return;
-   var status = verificarStatusLoja();
+   const status = verificarStatusLoja();
    statusEl.classList.remove('status-aberto', 'status-fechado');
    statusEl.classList.add(status.aberto ? 'status-aberto' : 'status-fechado');
    statusEl.querySelector('.status-texto').textContent = status.texto;
 }
 
-// ========== FUNÇÃO: NORMALIZAR TEXTO (Remove acentos e converte para lowercase) ==========
-function normalizarTextoParaPesquisa(texto) {
-   if (!texto) return '';
-   return texto.toString()
-      .toLowerCase() // CAFÉ → café
-      .normalize('NFD') // Decompõe caracteres acentuados
-      .replace(/[\u0300-\u036f]/g, '') // Remove marcas de acento
-      .trim(); // Remove espaços das pontas
-}
-
-// ========== FUNÇÃO: FILTRAR PRODUTOS ==========
-function filtrarProdutos(termo, categoria = null) {
-   // Normaliza o termo de busca
-   const termoNormalizado = normalizarTextoParaPesquisa(termo);
-   
-   // Se não há termo de busca
-   if (!termoNormalizado) {
-      // Se há categoria ativa, retorna produtos da categoria
-      if (categoria) {
-         return produtos.filter(p => p.categoria === categoria);
-      }
-      // Se não há categoria, retorna todos os produtos
-      return produtos;
-   }
-   
-   // Filtra produtos
+// ========== PESQUISA GLOBAL ==========
+function pesquisarProdutosGlobal(termo) {
+   if (!termo || termo.trim() === '') return [];
+   const termoNormalizado = normalizarTexto(termo);
    return produtos.filter(produto => {
-      // Se há categoria ativa, filtra apenas produtos dessa categoria
-      if (categoria && produto.categoria !== categoria) {
-         return false;
-      }
-      
-      // Normaliza nome e descrição do produto
-      const nomeNormalizado = normalizarTextoParaPesquisa(produto.nome);
-      const descricaoNormalizada = normalizarTextoParaPesquisa(produto.descricao);
-      
-      // Verifica se o termo está no nome OU na descrição
-      return nomeNormalizado.includes(termoNormalizado) || 
-             descricaoNormalizada.includes(termoNormalizado);
+      const nomeNormalizado = normalizarTexto(produto.nome);
+      const descricaoNormalizada = normalizarTexto(produto.descricao);
+      return nomeNormalizado.includes(termoNormalizado) || descricaoNormalizada.includes(termoNormalizado);
    });
 }
 
-// ========== FUNÇÃO: RENDERIZAR PRODUTOS COM PESQUISA ==========
-function renderizarProdutosComPesquisa() {
-   // Filtra produtos
-   produtosFiltrados = filtrarProdutos(termoPesquisa, categoriaAtiva);
-   
-   // Pega o container ativo
-   let containerAtivo;
-   if (categoriaAtiva) {
-      containerAtivo = document.getElementById(`lista-${categoriaAtiva}`);
-   } else {
-      // Se não há categoria ativa, usa o primeiro visível
-      const secaoVisivel = document.querySelector('.secao[style*="display: block"]');
-      if (secaoVisivel) {
-         containerAtivo = secaoVisivel.querySelector('.lista-produtos');
-      }
-   }
-   
-   if (!containerAtivo) return;
-   
-   // Limpa container
-   containerAtivo.innerHTML = '';
-   
-   // Se nenhum produto encontrado
-   if (produtosFiltrados.length === 0) {
-      containerAtivo.innerHTML = `
-         <div class="pesquisa-vazia">
-            <div class="pesquisa-vazia-icone">🔍</div>
-            <h3>Ops! Nenhum produto encontrado</h3>
-            <p>Tente buscar por outro termo ou explore nossas categorias</p>
-         </div>
-      `;
+function renderizarResultadosGlobais() {
+   const container = document.getElementById('listaPesquisaGlobal');
+   const termoParagrafo = document.querySelector('.pesquisa-global-termo');
+   termoParagrafo.textContent = 'Buscando por: "' + termoPesquisaGlobal + '"';
+   const resultados = pesquisarProdutosGlobal(termoPesquisaGlobal);
+   container.innerHTML = '';
+   if (resultados.length === 0) {
+      container.innerHTML = '<div class="pesquisa-vazia"><div class="pesquisa-vazia-icone">🔍</div><h3>Nenhum item encontrado</h3><p>Não encontramos nenhum produto com "' + termoPesquisaGlobal + '".<br>Tente buscar por outro termo ou explore nossas categorias.</p></div>';
       return;
    }
-   
-   // Renderiza produtos filtrados
-   produtosFiltrados.forEach(produto => {
-      containerAtivo.innerHTML += criarCardProduto(produto);
-   });
+   resultados.forEach(produto => { container.innerHTML += criarCardProduto(produto); });
 }
 
-// ============================================================
-// SELETOR DE BAIRRO E TAXA DE FRETE
-// ============================================================
+function alternarVisualizacao() {
+   const todasSecoes = document.querySelectorAll('.secao');
+   const secaoPesquisaGlobal = document.getElementById('resultadosPesquisaGlobal');
+   const temTexto = termoPesquisaGlobal.trim().length > 0;
+   
+   if (temTexto) {
+      modoPesquisaGlobal = true;
+      todasSecoes.forEach(secao => { secao.style.display = 'none'; });
+      secaoPesquisaGlobal.style.display = 'block';
+      renderizarResultadosGlobais();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+   } else {
+      modoPesquisaGlobal = false;
+      secaoPesquisaGlobal.style.display = 'none';
+      const linkAtivo = document.querySelector('.categoria-link.ativo');
+      if (linkAtivo) {
+         const secaoId = linkAtivo.getAttribute('href').substring(1);
+         const secao = document.getElementById(secaoId);
+         if (secao) secao.style.display = 'block';
+      } else {
+         const primeiraSecao = document.getElementById('pizza');
+         if (primeiraSecao) primeiraSecao.style.display = 'block';
+      }
+   }
+}
 
+// ========== BAIRROS E FRETE ==========
 function renderizarBairros() {
-   var select = document.getElementById('selectBairro');
+   const select = document.getElementById('selectBairro');
    if (!select) return;
    select.innerHTML = '<option value="">Selecione seu bairro...</option>';
-   bairros.forEach(function(bairro) {
-      var option = document.createElement('option');
-      option.value        = Number(bairro.taxa) || 0;
-      option.dataset.nome = bairro.nome;
-      option.textContent  = bairro.nome + ' — R$ ' + Number(bairro.taxa).toFixed(2).replace('.', ',');
+   bairros.forEach(b => {
+      const option = document.createElement('option');
+      option.value = Number(b.taxa) || 0;
+      option.dataset.nome = b.nome;
+      option.textContent = b.nome + ' — R$ ' + Number(b.taxa).toFixed(2).replace('.', ',');
       select.appendChild(option);
    });
 }
 
 function atualizarTotalComFrete() {
-   var subtotal = 0;
-   carrinho.forEach(function(item) { subtotal += item.precoNumero * item.quantidade; });
-   var total = subtotal + taxaEntregaSelecionada;
-
-   var totalValorEl = document.getElementById('totalValor');
+   let subtotal = 0;
+   carrinho.forEach(item => { subtotal += item.precoNumero * item.quantidade; });
+   const total = subtotal + taxaEntregaSelecionada;
+   
+   const totalValorEl = document.getElementById('totalValor');
    if (totalValorEl) totalValorEl.textContent = 'R$ ' + subtotal.toFixed(2).replace('.', ',');
-
-   var resumoSubtotalEl = document.getElementById('resumoSubtotal');
-   var resumoFreteEl    = document.getElementById('resumoFrete');
-   var resumoTotalEl    = document.getElementById('resumoTotal');
-
+   
+   const resumoSubtotalEl = document.getElementById('resumoSubtotal');
+   const resumoFreteEl = document.getElementById('resumoFrete');
+   const resumoTotalEl = document.getElementById('resumoTotal');
+   
    if (resumoSubtotalEl) resumoSubtotalEl.textContent = 'R$ ' + subtotal.toFixed(2).replace('.', ',');
-   if (resumoFreteEl) resumoFreteEl.textContent = taxaEntregaSelecionada > 0
-      ? 'R$ ' + taxaEntregaSelecionada.toFixed(2).replace('.', ',') : 'Gratis';
+   if (resumoFreteEl) resumoFreteEl.textContent = taxaEntregaSelecionada > 0 ? 'R$ ' + taxaEntregaSelecionada.toFixed(2).replace('.', ',') : 'Grátis';
    if (resumoTotalEl) resumoTotalEl.textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
 }
 
-// ============================================================
-// INICIALIZACAO
-// ============================================================
-document.addEventListener('DOMContentLoaded', function () {
-
-   var carrinhoPainel     = document.getElementById('carrinhoPainel');
-   var carrinhoOverlay    = document.getElementById('carrinhoOverlay');
-   var fecharCarrinhoBtn  = document.getElementById('fecharCarrinho');
-   var footerCarrinho     = document.querySelector('footer');
-   var menuLinks          = document.querySelectorAll('.opcoes a');
-   var modalOverlay       = document.getElementById('modalOverlay');
-   var modalTamanhos      = document.getElementById('modalTamanhos');
-   var modalFechar        = document.getElementById('modalFechar');
-   var modalImg           = document.getElementById('modalImg');
-   var modalNome          = document.getElementById('modalNome');
-   var modalDescricao     = document.getElementById('modalDescricao');
-   var modalAdicionar     = document.getElementById('modalAdicionar');
-   var etapa1             = document.getElementById('etapa1');
-   var etapa2             = document.getElementById('etapa2');
-   var tituloCarrinho     = document.getElementById('tituloCarrinho');
-   var voltarCarrinhoBtn  = document.getElementById('voltarCarrinho');
-   var continuarPedidoBtn = document.getElementById('continuarPedido');
-   var finalizarPedidoBtn = document.getElementById('finalizarPedido');
-   var radioEntrega       = document.getElementById('radioEntrega');
-   var radioRetirada      = document.getElementById('radioRetirada');
-   var secaoEndereco      = document.getElementById('secaoEndereco');
-   var radioPix           = document.getElementById('radioPix');
-   var radioDebito        = document.getElementById('radioDebito');
-   var radioCredito       = document.getElementById('radioCredito');
-   var radioDinheiro      = document.getElementById('radioDinheiro');
-   var secaoTroco         = document.getElementById('secaoTroco');
-   var semTrocoCheckbox   = document.getElementById('semTroco');
-   var valorTrocoInput    = document.getElementById('valorTroco');
-   var selectBairro       = document.getElementById('selectBairro');
-   var produtoAtual       = null;
-   var tamanhoSelecionado = null;
-
-      // ========== ELEMENTOS DA PESQUISA ==========
+// ========== INICIALIZAÇÃO ==========
+document.addEventListener('DOMContentLoaded', function() {
+   const carrinhoPainel = document.getElementById('carrinhoPainel');
+   const carrinhoOverlay = document.getElementById('carrinhoOverlay');
+   const footerCarrinho = document.querySelector('footer');
    const inputPesquisa = document.getElementById('pesquisar');
    const btnLimparPesquisa = document.getElementById('limparPesquisa');
+   const modalOverlay = document.getElementById('modalOverlay');
+   const modalTamanhos = document.getElementById('modalTamanhos');
+   const modalImg = document.getElementById('modalImg');
+   const modalNome = document.getElementById('modalNome');
+   const modalDescricao = document.getElementById('modalDescricao');
+   const selectBairro = document.getElementById('selectBairro');
    
-   // ========== EVENT LISTENER: INPUT DE PESQUISA (Tempo Real) ==========
-   /**
-    * Dispara a cada tecla digitada (tempo real).
-    * 
-    * Fluxo:
-    * 1. Captura o texto digitado
-    * 2. Mostra/esconde botão de limpar
-    * 3. Atualiza termo de pesquisa global
-    * 4. Re-renderiza produtos filtrados
-    */
-   inputPesquisa.addEventListener('input', function(e) {
-      termoPesquisa = e.target.value;
-      
-      // Mostra botão X se há texto
-      if (termoPesquisa.length > 0) {
-         btnLimparPesquisa.style.display = 'flex';
-      } else {
-         btnLimparPesquisa.style.display = 'none';
-      }
-      
-      // Re-renderiza produtos com filtro
-      renderizarProdutosComPesquisa();
-   });
+   let produtoAtual = null;
+   let tamanhoSelecionado = null;
    
-   // ========== EVENT LISTENER: BOTÃO LIMPAR (X) ==========
-   /**
-    * Limpa a pesquisa e restaura todos os produtos.
-    */
-   btnLimparPesquisa.addEventListener('click', function() {
-      inputPesquisa.value = '';
-      termoPesquisa = '';
-      btnLimparPesquisa.style.display = 'none';
-      
-      // Re-renderiza produtos (todos)
-      renderizarProdutosComPesquisa();
-      
-      // Foca no input para continuar digitando
-      inputPesquisa.focus();
-   });
-   
-   // ========== EVENT LISTENER: CATEGORIAS (Atualizado com integração de pesquisa) ==========
-   document.querySelectorAll('.categoria-link').forEach(link => {
-      link.addEventListener('click', function(e) {
-         e.preventDefault();
-         
-         const secaoId = this.getAttribute('href').substring(1);
-         
-         // Atualiza categoria ativa
-         categoriaAtiva = secaoId;
-         
-         // Esconde todas as seções
-         document.querySelectorAll('.secao').forEach(s => s.style.display = 'none');
-         
-         // Mostra a seção clicada
-         const secao = document.getElementById(secaoId);
-         if (secao) {
-            secao.style.display = 'block';
-            
-            // Reset de scroll
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            const listaContainer = secao.querySelector('.lista-produtos');
-            if (listaContainer) {
-               listaContainer.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-            }
-            
-            // ========== INTEGRAÇÃO COM PESQUISA ==========
-            // Se há termo de pesquisa ativo, filtra na nova categoria
-            if (termoPesquisa) {
-               renderizarProdutosComPesquisa();
-            } else {
-               // Caso contrário, renderiza produtos normais da categoria
-               listaContainer.innerHTML = '';
-               produtos.filter(p => p.categoria === secaoId).forEach(produto => {
-                  listaContainer.innerHTML += criarCardProduto(produto);
-               });
-            }
-         }
-         
-         // Atualiza indicador visual
-         document.querySelectorAll('.categoria-link').forEach(l => l.classList.remove('ativo'));
-         this.classList.add('ativo');
-      });
-   });
-
-
-   // ========== CARRINHO ==========
+   // Funções do carrinho
    function abrirCarrinho() { carrinhoPainel.classList.add('aberto'); carrinhoOverlay.classList.add('ativo'); document.body.style.overflow = 'hidden'; }
    function fecharCarrinho() { carrinhoPainel.classList.remove('aberto'); carrinhoOverlay.classList.remove('ativo'); document.body.style.overflow = ''; }
-
+   
    function atualizarCarrinho() {
-      var carrinhoItens = document.getElementById('carrinhoItens');
-      var carrinhoVazio = document.getElementById('carrinhoVazio');
-      var totalValor    = document.getElementById('totalValor');
+      const carrinhoItens = document.getElementById('carrinhoItens');
+      const carrinhoVazio = document.getElementById('carrinhoVazio');
+      const totalValor = document.getElementById('totalValor');
       carrinhoItens.innerHTML = '';
       if (carrinho.length === 0) {
          carrinhoVazio.style.display = 'block';
          totalValor.textContent = 'R$ 0,00';
-         footerCarrinho.innerHTML = '<a href="#carrinho">(0) Meu Carrinho <img src="icons/carrinho-icon.png" alt="icone de um carrinho de compras"></a>';
+         footerCarrinho.innerHTML = '<a href="#carrinho">(0) Meu Carrinho <img src="icons/carrinho-icon.png"></a>';
          return;
       }
       carrinhoVazio.style.display = 'none';
-      var total = 0, quantidadeTotal = 0;
-      carrinho.forEach(function(item) {
+      let total = 0, quantidadeTotal = 0;
+      carrinho.forEach(item => {
          total += item.precoNumero * item.quantidade;
          quantidadeTotal += item.quantidade;
-         carrinhoItens.innerHTML += '<div class="item-carrinho" data-id="' + item.id + '"><img src="' + item.img + '" alt="' + item.nome + '" onerror="this.src=\'images/placeholder.jpg\'"><div class="item-info"><h4>' + item.nome + '</h4><p class="item-preco">' + item.preco + '</p><div class="item-quantidade"><button class="btn-quantidade" data-acao="diminuir" data-id="' + item.id + '">-</button><span class="quantidade-numero">' + item.quantidade + '</span><button class="btn-quantidade" data-acao="aumentar" data-id="' + item.id + '">+</button></div></div><button class="remover-item" data-id="' + item.id + '">🗑️</button></div>';
+         carrinhoItens.innerHTML += '<div class="item-carrinho" data-id="'+item.id+'"><img src="'+item.img+'" alt="'+item.nome+'" onerror="this.src=\'images/placeholder.jpg\'"><div class="item-info"><h4>'+item.nome+'</h4><p class="item-preco">'+item.preco+'</p><div class="item-quantidade"><button class="btn-quantidade" data-acao="diminuir" data-id="'+item.id+'">-</button><span class="quantidade-numero">'+item.quantidade+'</span><button class="btn-quantidade" data-acao="aumentar" data-id="'+item.id+'">+</button></div></div><button class="remover-item" data-id="'+item.id+'">🗑️</button></div>';
       });
       totalValor.textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
-      footerCarrinho.innerHTML = '<a href="#carrinho">(' + quantidadeTotal + ') Meu Carrinho <img src="icons/carrinho-icon.png" alt="icone de um carrinho de compras"></a>';
+      footerCarrinho.innerHTML = '<a href="#carrinho">('+quantidadeTotal+') Meu Carrinho <img src="icons/carrinho-icon.png"></a>';
    }
-
+   
    function abrirModalTamanhos(produtoElement) {
-      produtoAtual = { id: produtoElement.dataset.id, nome: produtoElement.dataset.nome, descricao: produtoElement.dataset.descricao, img: produtoElement.dataset.img, tipo: produtoElement.dataset.tipo, precoP: parseFloat(produtoElement.dataset.precoP), precoM: parseFloat(produtoElement.dataset.precoM), precoG: parseFloat(produtoElement.dataset.precoG) };
+      produtoAtual = { id: produtoElement.dataset.id, nome: produtoElement.dataset.nome, descricao: produtoElement.dataset.descricao, img: produtoElement.dataset.img, precoP: parseFloat(produtoElement.dataset.precoP), precoM: parseFloat(produtoElement.dataset.precoM), precoG: parseFloat(produtoElement.dataset.precoG) };
       tamanhoSelecionado = null;
-      var urlImagem = processarURLImagem(produtoAtual.img);
-      modalImg.src = urlImagem; modalImg.alt = produtoAtual.nome;
-      modalImg.onerror = function() { this.src = 'images/placeholder.jpg'; };
+      const urlImagem = processarURLImagem(produtoAtual.img);
+      modalImg.src = urlImagem; modalImg.alt = produtoAtual.nome; modalImg.onerror = function() { this.src = 'images/placeholder.jpg'; };
       modalNome.textContent = produtoAtual.nome; modalDescricao.textContent = produtoAtual.descricao;
       document.getElementById('precoP').textContent = 'R$ ' + produtoAtual.precoP.toFixed(2).replace('.', ',');
       document.getElementById('precoM').textContent = 'R$ ' + produtoAtual.precoM.toFixed(2).replace('.', ',');
       document.getElementById('precoG').textContent = 'R$ ' + produtoAtual.precoG.toFixed(2).replace('.', ',');
-      document.querySelectorAll('.btn-tamanho').forEach(function(btn) { btn.classList.remove('selecionado'); });
+      document.querySelectorAll('.btn-tamanho').forEach(btn => { btn.classList.remove('selecionado'); });
       modalOverlay.classList.add('ativo'); modalTamanhos.classList.add('ativo'); document.body.style.overflow = 'hidden';
    }
-
+   
    function fecharModalTamanhos() { modalOverlay.classList.remove('ativo'); modalTamanhos.classList.remove('ativo'); document.body.style.overflow = ''; produtoAtual = null; tamanhoSelecionado = null; }
-
+   
    function irParaEtapa2() {
-      if (carrinho.length === 0) { alert('Adicione produtos ao carrinho antes de continuar!'); return; }
-      etapa1.style.display = 'none'; etapa2.style.display = 'flex';
-      tituloCarrinho.textContent = 'Finalizar Pedido'; voltarCarrinhoBtn.style.display = 'flex';
-      atualizarResumoPedido(); etapaAtual = 2;
+      if (carrinho.length === 0) { alert('Adicione produtos ao carrinho!'); return; }
+      document.getElementById('etapa1').style.display = 'none'; document.getElementById('etapa2').style.display = 'flex';
+      document.getElementById('tituloCarrinho').textContent = 'Finalizar Pedido'; document.getElementById('voltarCarrinho').style.display = 'flex';
+      atualizarResumoPedido();
    }
-
-   function voltarParaEtapa1() { etapa2.style.display = 'none'; etapa1.style.display = 'flex'; tituloCarrinho.textContent = 'Meu Carrinho'; voltarCarrinhoBtn.style.display = 'none'; etapaAtual = 1; }
-
+   
+   function voltarParaEtapa1() { document.getElementById('etapa2').style.display = 'none'; document.getElementById('etapa1').style.display = 'flex'; document.getElementById('tituloCarrinho').textContent = 'Meu Carrinho'; document.getElementById('voltarCarrinho').style.display = 'none'; }
+   
    function atualizarResumoPedido() {
-      var resumoItens = document.getElementById('resumoItens');
+      const resumoItens = document.getElementById('resumoItens');
       if (!resumoItens) return;
       resumoItens.innerHTML = '';
-      carrinho.forEach(function(item) {
-         var sub = item.precoNumero * item.quantidade;
-         resumoItens.innerHTML += '<div class="resumo-item"><span>' + item.quantidade + 'x ' + item.nome + '</span><span>R$ ' + sub.toFixed(2).replace('.', ',') + '</span></div>';
+      carrinho.forEach(item => {
+         const sub = item.precoNumero * item.quantidade;
+         resumoItens.innerHTML += '<div class="resumo-item"><span>'+item.quantidade+'x '+item.nome+'</span><span>R$ '+sub.toFixed(2).replace('.', ',')+'</span></div>';
       });
       atualizarTotalComFrete();
    }
-
-   function limparCamposEndereco() { document.getElementById('rua').value = ''; document.getElementById('nomePessoa').value = ''; document.getElementById('referencia').value = ''; }
-
+   
    function validarFormulario() {
-      var valido = true; var mensagensErro = [];
-      document.querySelectorAll('.erro').forEach(function(el) { el.classList.remove('erro'); });
-      var tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked');
-      if (!tipoEntrega) { mensagensErro.push('Selecione como deseja receber o pedido'); valido = false; }
+      let valido = true; let mensagensErro = [];
+      document.querySelectorAll('.erro').forEach(el => { el.classList.remove('erro'); });
+      const tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked');
+      if (!tipoEntrega) { mensagensErro.push('Selecione o tipo de entrega'); valido = false; }
       if (tipoEntrega && tipoEntrega.value === 'entrega') {
-         var rua = document.getElementById('rua'); var nomePessoa = document.getElementById('nomePessoa');
-         if (!rua.value.trim()) { rua.classList.add('erro'); mensagensErro.push('Preencha o endereco'); valido = false; }
-         if (!nomePessoa.value.trim()) { nomePessoa.classList.add('erro'); mensagensErro.push('Preencha o nome de quem vai receber'); valido = false; }
-         if (selectBairro && !selectBairro.value) { selectBairro.classList.add('erro'); mensagensErro.push('Selecione o bairro para entrega'); valido = false; }
+         const rua = document.getElementById('rua'); const nomePessoa = document.getElementById('nomePessoa');
+         if (!rua.value.trim()) { rua.classList.add('erro'); mensagensErro.push('Preencha o endereço'); valido = false; }
+         if (!nomePessoa.value.trim()) { nomePessoa.classList.add('erro'); mensagensErro.push('Preencha o nome'); valido = false; }
+         if (selectBairro && !selectBairro.value) { selectBairro.classList.add('erro'); mensagensErro.push('Selecione o bairro'); valido = false; }
       }
-      var formaPagamento = document.querySelector('input[name="formaPagamento"]:checked');
+      const formaPagamento = document.querySelector('input[name="formaPagamento"]:checked');
       if (!formaPagamento) { mensagensErro.push('Selecione a forma de pagamento'); valido = false; }
       if (formaPagamento && formaPagamento.value === 'dinheiro') {
-         var valorTroco = document.getElementById('valorTroco'); var semTroco = document.getElementById('semTroco');
+         const valorTroco = document.getElementById('valorTroco'); const semTroco = document.getElementById('semTroco');
          if (!semTroco.checked && !valorTroco.value) { valorTroco.classList.add('erro'); mensagensErro.push('Informe o valor do troco'); valido = false; }
       }
-      if (!valido) alert('Por favor, preencha todos os campos obrigatorios:\n\n' + mensagensErro.join('\n'));
+      if (!valido) alert('Preencha todos os campos:\n\n' + mensagensErro.join('\n'));
       return valido;
    }
-
-   function coletarDadosPedido() {
-      var tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked').value;
-      var endereco = null;
-      if (tipoEntrega === 'entrega') {
-         var bairroNome = selectBairro ? selectBairro.options[selectBairro.selectedIndex].dataset.nome : '';
-         endereco = { rua: document.getElementById('rua').value.trim(), nomePessoa: document.getElementById('nomePessoa').value.trim(), referencia: document.getElementById('referencia').value.trim(), bairro: bairroNome, taxaFrete: taxaEntregaSelecionada };
-      }
-      var formaPagamento = document.querySelector('input[name="formaPagamento"]:checked').value;
-      var troco = null;
-      if (formaPagamento === 'dinheiro') { troco = document.getElementById('semTroco').checked ? 'sem troco' : parseFloat(document.getElementById('valorTroco').value); }
-      var subtotal = 0; carrinho.forEach(function(item) { subtotal += item.precoNumero * item.quantidade; });
-      return { itens: carrinho.slice(), subtotal: subtotal, taxaFrete: taxaEntregaSelecionada, total: subtotal + taxaEntregaSelecionada, tipoEntrega: tipoEntrega, endereco: endereco, formaPagamento: formaPagamento, troco: troco };
-   }
-
+   
    function finalizarPedido() {
       if (!validarFormulario()) return;
-      dadosPedido = coletarDadosPedido();
-      alert('Pedido registrado com sucesso!\n\nEm breve voce sera redirecionado para o WhatsApp.');
+      alert('Pedido registrado!\n\nEm breve você será redirecionado para o WhatsApp.');
       carrinho = []; taxaEntregaSelecionada = 0;
-      atualizarCarrinho(); fecharCarrinho(); voltarParaEtapa1(); limparFormulario();
-   }
-
-   function limparFormulario() {
-      document.querySelectorAll('input[type="radio"]').forEach(function(r) { r.checked = false; });
-      document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(function(i) { i.value = ''; i.classList.remove('erro'); });
+      atualizarCarrinho(); fecharCarrinho(); voltarParaEtapa1();
+      document.querySelectorAll('input[type="radio"]').forEach(r => { r.checked = false; });
+      document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(i => { i.value = ''; i.classList.remove('erro'); });
       document.getElementById('semTroco').checked = false;
-      secaoEndereco.style.display = 'none'; secaoTroco.style.display = 'none';
+      document.getElementById('secaoEndereco').style.display = 'none'; document.getElementById('secaoTroco').style.display = 'none';
       if (selectBairro) selectBairro.selectedIndex = 0;
-      taxaEntregaSelecionada = 0; atualizarTotalComFrete();
+      atualizarTotalComFrete();
    }
-
-   // Event Listeners
+   
+   // Event listeners - Pesquisa
+   inputPesquisa.addEventListener('input', function(e) {
+      termoPesquisaGlobal = e.target.value;
+      btnLimparPesquisa.style.display = termoPesquisaGlobal.length > 0 ? 'flex' : 'none';
+      alternarVisualizacao();
+   });
+   
+   btnLimparPesquisa.addEventListener('click', function() {
+      inputPesquisa.value = '';
+      termoPesquisaGlobal = '';
+      btnLimparPesquisa.style.display = 'none';
+      alternarVisualizacao();
+      inputPesquisa.focus();
+   });
+   
+   // Event listeners - Navegação
    document.querySelectorAll('.categoria-link').forEach(link => {
-   link.addEventListener('click', function(e) {
-      e.preventDefault();
-
-      const secaoId = this.getAttribute('href').substring(1);
-
-      document.querySelectorAll('.secao').forEach(s => s.style.display = 'none');
-
-      const secao = document.getElementById(secaoId);
-      if (secao) {
-         secao.style.display = 'block';
-         
-         // ========== RESET DE SCROLL ==========
-         // Força o scroll da página principal para o topo
-         window.scrollTo({ top: 0, behavior: 'smooth' });
-         
-         // Se a seção tiver uma lista de produtos com scroll próprio, reseta também
-         const listaContainer = secao.querySelector('.lista-produtos');
-         if (listaContainer) {
-            listaContainer.scrollTop = 0; // Reset vertical
-            listaContainer.scrollLeft = 0; // Reset horizontal (se houver)
-         }
-      }
-
-      document.querySelectorAll('.categoria-link').forEach(l => l.classList.remove('ativo'));
-      this.classList.add('ativo');
+      link.addEventListener('click', function(e) {
+         e.preventDefault();
+         if (modoPesquisaGlobal) { inputPesquisa.value = ''; termoPesquisaGlobal = ''; btnLimparPesquisa.style.display = 'none'; }
+         const secaoId = this.getAttribute('href').substring(1);
+         document.querySelectorAll('.secao').forEach(s => { s.style.display = 'none'; });
+         document.getElementById('resultadosPesquisaGlobal').style.display = 'none';
+         const secao = document.getElementById(secaoId);
+         if (secao) { secao.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+         document.querySelectorAll('.categoria-link').forEach(l => { l.classList.remove('ativo'); });
+         this.classList.add('ativo');
+      });
    });
-});
-
-// Subcategorias - Simplificada
-document.querySelectorAll('.subcategoria-card').forEach(link => {
-   link.addEventListener('click', function(e) {
-      e.preventDefault();
-
-      const produtoId = this.getAttribute('href').substring(1);
-
-      document.querySelectorAll('.secao').forEach(s => s.style.display = 'none');
-
-      const secao = document.getElementById(produtoId);
-      if (secao) {
-         secao.style.display = 'block';
-         
-         // ========== RESET DE SCROLL ==========
-         // Força o scroll da página principal para o topo
-         window.scrollTo({ top: 0, behavior: 'smooth' });
-         
-         // Se a seção tiver uma lista de produtos com scroll próprio, reseta também
-         const listaContainer = secao.querySelector('.lista-produtos');
-         if (listaContainer) {
-            listaContainer.scrollTop = 0; // Reset vertical
-            listaContainer.scrollLeft = 0; // Reset horizontal (se houver)
-         }
-      }
+   
+   document.querySelectorAll('.subcategoria-card').forEach(link => {
+      link.addEventListener('click', function(e) {
+         e.preventDefault();
+         if (modoPesquisaGlobal) { inputPesquisa.value = ''; termoPesquisaGlobal = ''; btnLimparPesquisa.style.display = 'none'; }
+         const produtoId = this.getAttribute('href').substring(1);
+         document.querySelectorAll('.secao').forEach(s => { s.style.display = 'none'; });
+         document.getElementById('resultadosPesquisaGlobal').style.display = 'none';
+         const secao = document.getElementById(produtoId);
+         if (secao) { secao.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+      });
    });
-});
-
-   footerCarrinho.addEventListener('click', function(e) { e.preventDefault(); abrirCarrinho(); });
-   fecharCarrinhoBtn.addEventListener('click', fecharCarrinho);
+   
+   // Event listeners - Carrinho
+   footerCarrinho.addEventListener('click', e => { e.preventDefault(); abrirCarrinho(); });
+   document.getElementById('fecharCarrinho').addEventListener('click', fecharCarrinho);
    carrinhoOverlay.addEventListener('click', fecharCarrinho);
-   modalFechar.addEventListener('click', fecharModalTamanhos);
-   modalOverlay.addEventListener('click', function(e) { if (e.target === modalOverlay) fecharModalTamanhos(); });
-   modalTamanhos.addEventListener('click', function(e) { e.stopPropagation(); });
-
-   document.querySelectorAll('.btn-tamanho').forEach(function(botao) {
+   
+   // Event listeners - Modal
+   document.getElementById('modalFechar').addEventListener('click', fecharModalTamanhos);
+   modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) fecharModalTamanhos(); });
+   modalTamanhos.addEventListener('click', e => { e.stopPropagation(); });
+   
+   document.querySelectorAll('.btn-tamanho').forEach(botao => {
       botao.addEventListener('click', function() {
-         document.querySelectorAll('.btn-tamanho').forEach(function(b) { b.classList.remove('selecionado'); });
+         document.querySelectorAll('.btn-tamanho').forEach(b => { b.classList.remove('selecionado'); });
          this.classList.add('selecionado'); tamanhoSelecionado = this.dataset.tamanho;
       });
    });
-
-   modalAdicionar.addEventListener('click', function() {
-      if (!tamanhoSelecionado) { alert('Por favor, escolha um tamanho!'); return; }
-      var precoNumero;
+   
+   document.getElementById('modalAdicionar').addEventListener('click', function() {
+      if (!tamanhoSelecionado) { alert('Escolha um tamanho!'); return; }
+      let precoNumero;
       if (tamanhoSelecionado === 'P') precoNumero = produtoAtual.precoP;
       else if (tamanhoSelecionado === 'M') precoNumero = produtoAtual.precoM;
       else precoNumero = produtoAtual.precoG;
-      var produto = { id: Date.now(), nome: produtoAtual.nome + ' (' + tamanhoSelecionado + ')', tamanho: tamanhoSelecionado, preco: 'R$ ' + precoNumero.toFixed(2).replace('.', ','), precoNumero: precoNumero, img: processarURLImagem(produtoAtual.img), quantidade: 1 };
-      var existente = carrinho.find(function(i) { return i.nome === produto.nome && i.tamanho === produto.tamanho; });
+      const produto = { id: Date.now(), nome: produtoAtual.nome + ' (' + tamanhoSelecionado + ')', tamanho: tamanhoSelecionado, preco: 'R$ ' + precoNumero.toFixed(2).replace('.', ','), precoNumero: precoNumero, img: processarURLImagem(produtoAtual.img), quantidade: 1 };
+      const existente = carrinho.find(i => i.nome === produto.nome && i.tamanho === produto.tamanho);
       if (existente) existente.quantidade++;
       else carrinho.push(produto);
       atualizarCarrinho(); fecharModalTamanhos();
    });
-
+   
+   // Event listeners - Adicionar produtos
    document.body.addEventListener('click', function(e) {
       if (e.target.classList.contains('adicionar-carrinho')) {
-         var produtoDiv = e.target.closest('.produto'); if (!produtoDiv) return;
+         const produtoDiv = e.target.closest('.produto'); if (!produtoDiv) return;
          if (produtoDiv.dataset.tipo === 'tamanhos') { abrirModalTamanhos(produtoDiv); return; }
-         var produto = { id: Date.now(), nome: produtoDiv.dataset.nome, preco: 'R$ ' + parseFloat(produtoDiv.dataset.precoUnico).toFixed(2).replace('.', ','), precoNumero: parseFloat(produtoDiv.dataset.precoUnico), img: processarURLImagem(produtoDiv.dataset.img), quantidade: 1 };
-         var existente = carrinho.find(function(i) { return i.nome === produto.nome; });
+         const produto = { id: Date.now(), nome: produtoDiv.dataset.nome, preco: 'R$ ' + parseFloat(produtoDiv.dataset.precoUnico).toFixed(2).replace('.', ','), precoNumero: parseFloat(produtoDiv.dataset.precoUnico), img: processarURLImagem(produtoDiv.dataset.img), quantidade: 1 };
+         const existente = carrinho.find(i => i.nome === produto.nome);
          if (existente) existente.quantidade++;
          else carrinho.push(produto);
          atualizarCarrinho();
          e.target.style.backgroundColor = '#4CAF50';
-         setTimeout(function() { e.target.style.backgroundColor = '#ff4747'; }, 1000);
+         setTimeout(() => { e.target.style.backgroundColor = '#ff4747'; }, 1000);
       }
       if (e.target.classList.contains('btn-quantidade')) {
-         var id = parseInt(e.target.dataset.id); var item = carrinho.find(function(i) { return i.id === id; }); if (!item) return;
+         const id = parseInt(e.target.dataset.id); const item = carrinho.find(i => i.id === id); if (!item) return;
          if (e.target.dataset.acao === 'aumentar') item.quantidade++;
-         else { if (item.quantidade > 1) item.quantidade--; else carrinho = carrinho.filter(function(i) { return i.id !== id; }); }
+         else { if (item.quantidade > 1) item.quantidade--; else carrinho = carrinho.filter(i => i.id !== id); }
          atualizarCarrinho();
       }
-      if (e.target.classList.contains('remover-item')) { carrinho = carrinho.filter(function(i) { return i.id !== parseInt(e.target.dataset.id); }); atualizarCarrinho(); }
+      if (e.target.classList.contains('remover-item')) { carrinho = carrinho.filter(i => i.id !== parseInt(e.target.dataset.id)); atualizarCarrinho(); }
    });
-
-   radioEntrega.addEventListener('change', function() { if (radioEntrega.checked) { secaoEndereco.style.display = 'block'; atualizarTotalComFrete(); } });
-   radioRetirada.addEventListener('change', function() {
-      if (radioRetirada.checked) {
-         secaoEndereco.style.display = 'none'; limparCamposEndereco();
+   
+   // Event listeners - Formulário
+   document.getElementById('radioEntrega').addEventListener('change', function() { if (this.checked) { document.getElementById('secaoEndereco').style.display = 'block'; atualizarTotalComFrete(); } });
+   document.getElementById('radioRetirada').addEventListener('change', function() {
+      if (this.checked) {
+         document.getElementById('secaoEndereco').style.display = 'none';
+         document.getElementById('rua').value = ''; document.getElementById('nomePessoa').value = ''; document.getElementById('referencia').value = '';
          taxaEntregaSelecionada = 0; if (selectBairro) selectBairro.selectedIndex = 0;
          atualizarTotalComFrete();
       }
    });
-
+   
    if (selectBairro) {
       selectBairro.addEventListener('change', function() {
          taxaEntregaSelecionada = parseFloat(this.value) || 0;
          atualizarTotalComFrete();
       });
    }
-
-   radioDinheiro.addEventListener('change', function() { if (radioDinheiro.checked) secaoTroco.style.display = 'block'; });
-   [radioPix, radioDebito, radioCredito].forEach(function(radio) {
-      radio.addEventListener('change', function() { if (radio.checked) { secaoTroco.style.display = 'none'; valorTrocoInput.value = ''; semTrocoCheckbox.checked = false; } });
+   
+   document.getElementById('radioDinheiro').addEventListener('change', function() { if (this.checked) document.getElementById('secaoTroco').style.display = 'block'; });
+   ['radioPix', 'radioDebito', 'radioCredito'].forEach(id => {
+      document.getElementById(id).addEventListener('change', function() { if (this.checked) { document.getElementById('secaoTroco').style.display = 'none'; document.getElementById('valorTroco').value = ''; document.getElementById('semTroco').checked = false; } });
    });
-   semTrocoCheckbox.addEventListener('change', function() { valorTrocoInput.disabled = this.checked; if (this.checked) valorTrocoInput.value = ''; });
-
-   continuarPedidoBtn.addEventListener('click', irParaEtapa2);
-   voltarCarrinhoBtn.addEventListener('click', voltarParaEtapa1);
-   finalizarPedidoBtn.addEventListener('click', finalizarPedido);
-
-   // Carrega dados em segundo plano
-   buscarDados().then(function(sucesso) {
+   document.getElementById('semTroco').addEventListener('change', function() { document.getElementById('valorTroco').disabled = this.checked; if (this.checked) document.getElementById('valorTroco').value = ''; });
+   
+   document.getElementById('continuarPedido').addEventListener('click', irParaEtapa2);
+   document.getElementById('voltarCarrinho').addEventListener('click', voltarParaEtapa1);
+   document.getElementById('finalizarPedido').addEventListener('click', finalizarPedido);
+   
+   // Carrega dados
+   buscarDados().then(sucesso => {
       if (!sucesso) return;
       renderizarProdutos();
       renderizarBairros();
       renderizarStatusLoja();
-      setInterval(renderizarStatusLoja, 60 * 1000);
+      setInterval(renderizarStatusLoja, 60000);
    });
-
 });
