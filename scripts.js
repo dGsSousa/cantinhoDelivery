@@ -244,16 +244,68 @@ document.addEventListener('DOMContentLoaded', function() {
    }
    
    function abrirModalTamanhos(produtoElement) {
-      produtoAtual = { id: produtoElement.dataset.id, nome: produtoElement.dataset.nome, descricao: produtoElement.dataset.descricao, img: produtoElement.dataset.img, precoP: parseFloat(produtoElement.dataset.precoP), precoM: parseFloat(produtoElement.dataset.precoM), precoG: parseFloat(produtoElement.dataset.precoG) };
+      // Coleta dados do produto
+      produtoAtual = { 
+         id: produtoElement.dataset.id, 
+         nome: produtoElement.dataset.nome, 
+         descricao: produtoElement.dataset.descricao, 
+         img: produtoElement.dataset.img, 
+         precoP: parseFloat(produtoElement.dataset.precoP) || null, 
+         precoM: parseFloat(produtoElement.dataset.precoM) || null, 
+         precoG: parseFloat(produtoElement.dataset.precoG) || null
+      };
       tamanhoSelecionado = null;
+      
+      // ========== FILTRAGEM DE TAMANHOS VÁLIDOS ==========
+      // Cria array com TODOS os tamanhos possíveis
+      const todosTamanhos = [
+         { letra: 'P', nome: 'Pequeno', preco: produtoAtual.precoP },
+         { letra: 'M', nome: 'Médio', preco: produtoAtual.precoM },
+         { letra: 'G', nome: 'Grande', preco: produtoAtual.precoG }
+      ];
+      
+      // FILTRA: Remove tamanhos sem preço (null, undefined, 0, NaN)
+      const tamanhosValidos = todosTamanhos.filter(tamanho => {
+         // Retorna true apenas se o preço for um número válido maior que zero
+         return tamanho.preco && !isNaN(tamanho.preco) && tamanho.preco > 0;
+      });
+      
+      // Atualiza imagem do modal
       const urlImagem = processarURLImagem(produtoAtual.img);
-      modalImg.src = urlImagem; modalImg.alt = produtoAtual.nome; modalImg.onerror = function() { this.src = 'images/placeholder.jpg'; };
-      modalNome.textContent = produtoAtual.nome; modalDescricao.textContent = produtoAtual.descricao;
-      document.getElementById('precoP').textContent = 'R$ ' + produtoAtual.precoP.toFixed(2).replace('.', ',');
-      document.getElementById('precoM').textContent = 'R$ ' + produtoAtual.precoM.toFixed(2).replace('.', ',');
-      document.getElementById('precoG').textContent = 'R$ ' + produtoAtual.precoG.toFixed(2).replace('.', ',');
-      document.querySelectorAll('.btn-tamanho').forEach(btn => { btn.classList.remove('selecionado'); });
-      modalOverlay.classList.add('ativo'); modalTamanhos.classList.add('ativo'); document.body.style.overflow = 'hidden';
+      modalImg.src = urlImagem; 
+      modalImg.alt = produtoAtual.nome; 
+      modalImg.onerror = function() { this.src = 'images/placeholder.jpg'; };
+      
+      // Atualiza textos
+      modalNome.textContent = produtoAtual.nome; 
+      modalDescricao.textContent = produtoAtual.descricao;
+      
+      // ========== RENDERIZAÇÃO DINÂMICA DOS BOTÕES ==========
+      const containerOpcoes = document.querySelector('.modal-tamanho-opcoes');
+      containerOpcoes.innerHTML = ''; // Limpa botões anteriores
+      
+      // Renderiza APENAS os tamanhos válidos
+      tamanhosValidos.forEach(tamanho => {
+         const botao = document.createElement('button');
+         botao.className = 'btn-tamanho';
+         botao.dataset.tamanho = tamanho.letra;
+         botao.innerHTML = '<span class="tamanho-letra">' + tamanho.letra + '</span>' +
+                          '<span class="tamanho-preco">R$ ' + tamanho.preco.toFixed(2).replace('.', ',') + '</span>';
+         
+         // Event listener para seleção
+         botao.addEventListener('click', function() {
+            document.querySelectorAll('.btn-tamanho').forEach(b => b.classList.remove('selecionado'));
+            this.classList.add('selecionado');
+            tamanhoSelecionado = this.dataset.tamanho;
+         });
+         
+         containerOpcoes.appendChild(botao);
+      });
+      
+      // Abre modal
+      modalOverlay.classList.add('ativo'); 
+      modalTamanhos.classList.add('ativo'); 
+      document.body.style.overflow = 'hidden';
    }
    
    function fecharModalTamanhos() { modalOverlay.classList.remove('ativo'); modalTamanhos.classList.remove('ativo'); document.body.style.overflow = ''; produtoAtual = null; tamanhoSelecionado = null; }
@@ -363,13 +415,6 @@ document.addEventListener('DOMContentLoaded', function() {
    document.getElementById('modalFechar').addEventListener('click', fecharModalTamanhos);
    modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) fecharModalTamanhos(); });
    modalTamanhos.addEventListener('click', e => { e.stopPropagation(); });
-   
-   document.querySelectorAll('.btn-tamanho').forEach(botao => {
-      botao.addEventListener('click', function() {
-         document.querySelectorAll('.btn-tamanho').forEach(b => { b.classList.remove('selecionado'); });
-         this.classList.add('selecionado'); tamanhoSelecionado = this.dataset.tamanho;
-      });
-   });
    
    document.getElementById('modalAdicionar').addEventListener('click', function() {
       if (!tamanhoSelecionado) { alert('Escolha um tamanho!'); return; }
