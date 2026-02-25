@@ -246,8 +246,12 @@ document.addEventListener('DOMContentLoaded', function() {
    let tamanhoSelecionado = null;
    
    // Funções do carrinho
-   function abrirCarrinho() { carrinhoPainel.classList.add('aberto'); carrinhoOverlay.classList.add('ativo'); document.body.style.overflow = 'hidden'; }
-   function fecharCarrinho() { carrinhoPainel.classList.remove('aberto'); carrinhoOverlay.classList.remove('ativo'); document.body.style.overflow = ''; }
+   function abrirCarrinho() { carrinhoPainel.classList.add('aberto'); carrinhoOverlay.classList.add('ativo'); document.body.style.overflow = 'hidden';
+      atualizarCarrinho();
+    }
+   function fecharCarrinho() { carrinhoPainel.classList.remove('aberto'); carrinhoOverlay.classList.remove('ativo'); document.body.style.overflow = '';
+      voltarParaEtapa1();
+    }
    
    function atualizarCarrinho() {
       const carrinhoItens = document.getElementById('carrinhoItens');
@@ -489,16 +493,64 @@ document.addEventListener('DOMContentLoaded', function() {
    // Event listeners - Adicionar produtos
    document.body.addEventListener('click', function(e) {
       if (e.target.classList.contains('adicionar-carrinho')) {
-         const produtoDiv = e.target.closest('.produto'); if (!produtoDiv) return;
+         const produtoDiv = e.target.closest('.produto'); 
+         if (!produtoDiv) return;
          if (produtoDiv.dataset.tipo === 'tamanhos') { abrirModalTamanhos(produtoDiv); return; }
+
+         // ========== 🆕 ANIMAÇÃO DO CARD ==========
+         // Adiciona classe de animação ao card inteiro
+         produtoDiv.classList.add('animando-adicao');
+         
+         // Remove a classe após a animação terminar (0.6s conforme CSS)
+         setTimeout(() => {
+            produtoDiv.classList.remove('animando-adicao');
+         }, 600);
+         
+         // Adiciona classe ao botão
+         e.target.classList.add('adicionado');
+
          const produto = { id: Date.now(), nome: obterNomeCompleto(produtoDiv.dataset.categoria, produtoDiv.dataset.nome), preco: 'R$ ' + parseFloat(produtoDiv.dataset.precoUnico).toFixed(2).replace('.', ','), precoNumero: parseFloat(produtoDiv.dataset.precoUnico), img: processarURLImagem(produtoDiv.dataset.img), quantidade: 1 };
          const existente = carrinho.find(i => i.nome === produto.nome);
          if (existente) existente.quantidade++;
          else carrinho.push(produto);
          atualizarCarrinho();
+
          e.target.style.backgroundColor = '#4CAF50';
-         setTimeout(() => { e.target.style.backgroundColor = '#ff4747'; }, 1000);
-      }
+         setTimeout(() => { 
+               e.target.style.backgroundColor = '#ff4747'; 
+               e.target.classList.remove('adicionado');  // ← remove classe do botão
+         }, 1000);
+
+         // Pega posição do produto
+         const produtoRect = produtoDiv.getBoundingClientRect();
+
+         // Pega posição do ícone do carrinho no footer
+         const carrinhoIcone = document.querySelector('footer img');
+         const carrinhoRect = carrinhoIcone.getBoundingClientRect();
+
+         // Cria clone da imagem
+         const clone = produtoDiv.querySelector('img').cloneNode();
+         clone.style.position = 'fixed';
+         clone.style.top = produtoRect.top + 'px';
+         clone.style.left = produtoRect.left + 'px';
+         clone.style.width = '80px';
+         clone.style.zIndex = '9999';
+         clone.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+         document.body.appendChild(clone);
+
+         // Força reflow para a transição funcionar
+         clone.offsetHeight;
+
+         // Move para o carrinho
+         clone.style.top = carrinhoRect.top + 'px';
+         clone.style.left = carrinhoRect.left + 'px';
+         clone.style.transform = 'scale(0.2)';
+         clone.style.opacity = '0';
+
+         // Remove após animação
+         setTimeout(() => clone.remove(), 800);
+               }
+
       if (e.target.classList.contains('btn-quantidade')) {
          const id = parseInt(e.target.dataset.id); const item = carrinho.find(i => i.id === id); if (!item) return;
          if (e.target.dataset.acao === 'aumentar') item.quantidade++;
@@ -557,26 +609,33 @@ document.getElementById('radioRetirada').addEventListener('change', function() {
    }
 
    function gerarMensagemWhatsApp() {
-   let mensagem = '🍕 *NOVO PEDIDO - CANTINHO DOS SABORES* 🍕\n\n';
-   
-   mensagem += '📝 *Itens:*\n';
+
+   const separadorGrande = '\n━━━━━━━━━━━━━━━━━━━━\n';
+   const separadorPequeno = '\n- - - - - - - - - - - - - - - - -\n';
+
+   let mensagem = '🔔 *NOVO PEDIDO* 🔔\n\n';
+   mensagem += separadorGrande;
+
+   mensagem += '📝 *Itens do pedido:*\n';
    carrinho.forEach(item => {
-      mensagem += `   • ${item.nome} x${item.quantidade} - ${item.preco}\n`;
+      mensagem += `  • ${item.nome} x${item.quantidade} - ${item.preco}\n`;
    });
    
    let subtotal = 0;
    carrinho.forEach(item => { subtotal += item.precoNumero * item.quantidade; });
    mensagem += `\n💵 *Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}\n\n`;
+   mensagem += separadorPequeno;
    
+   mensagem += separadorGrande;
    const tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked');
    if (tipoEntrega.value === 'entrega') {
       mensagem += '📍 *ENTREGA*\n';
       const bairroSelect = document.getElementById('selectBairro');
       const bairroNome = bairroSelect.options[bairroSelect.selectedIndex].dataset.nome;
-      mensagem += `   🏘️ Bairro: ${bairroNome}\n`;
-      mensagem += `   🚚 Taxa: R$ ${taxaEntregaSelecionada.toFixed(2).replace('.', ',')}\n`;
-      mensagem += `   🏠 Endereço: ${document.getElementById('rua').value}\n`;
-      mensagem += `   👤 Recebe: ${document.getElementById('nomePessoa').value}\n`;
+      mensagem += `  🏘️ Bairro: ${bairroNome}\n`;
+      mensagem += `  🚚 Taxa: R$ ${taxaEntregaSelecionada.toFixed(2).replace('.', ',')}\n`;
+      mensagem += `  🏠 Endereço: ${document.getElementById('rua').value}\n`;
+      mensagem += `  👤 Recebe: ${document.getElementById('nomePessoa').value}\n`;
       const referencia = document.getElementById('referencia').value;
       if (referencia) mensagem += `   📌 Referência: ${referencia}\n`;
    } else {
@@ -584,17 +643,19 @@ document.getElementById('radioRetirada').addEventListener('change', function() {
       mensagem += `   👤 Nome: ${document.getElementById('nomeRetirada').value}\n`;
    }
    
+   mensagem += separadorGrande;
    const total = subtotal + taxaEntregaSelecionada;
    mensagem += `\n💰 *TOTAL:* R$ ${total.toFixed(2).replace('.', ',')}\n\n`;
    
+   mensagem += separadorPequeno;
    const formaPagamento = document.querySelector('input[name="formaPagamento"]:checked');
    const formaTexto = {
-      'pix': '💳 PIX',
-      'debito': '💳 Cartão de Débito',
-      'credito': '💳 Cartão de Crédito',
-      'dinheiro': '💵 Dinheiro'
+      'pix': ' 📲 PIX',
+      'debito': ' 💳 Cartão de Débito',
+      'credito': ' 💳 Cartão de Crédito',
+      'dinheiro': ' 💵 Dinheiro'
    };
-   mensagem += `💳 *Pagamento:* ${formaTexto[formaPagamento.value]}`;
+   mensagem += `🪙 *Pagamento:* ${formaTexto[formaPagamento.value]}`;
    
    if (formaPagamento.value === 'dinheiro') {
       const semTroco = document.getElementById('semTroco').checked;
@@ -606,7 +667,8 @@ document.getElementById('radioRetirada').addEventListener('change', function() {
       }
    }
    
-   mensagem += '\n\n✅ _Pedido enviado via site_';
+   mensagem += separadorGrande;
+   mensagem += '\n\n✅ _Aguardando confirmação do estabelecimento_';
    
    return mensagem;
 }
