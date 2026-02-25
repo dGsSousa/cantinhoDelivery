@@ -609,24 +609,18 @@ document.getElementById('radioRetirada').addEventListener('change', function() {
    }
 
    function gerarMensagemWhatsApp() {
-
-   const separadorGrande = '\n━━━━━━━━━━━━━━━━━━━━\n';
    const separadorPequeno = '\n- - - - - - - - - - - - - - - - -\n';
 
-   let mensagem = '🔔 *NOVO PEDIDO* 🔔\n\n';
-   mensagem += separadorGrande;
-
+   let mensagem = '🔔 *----- NOVO PEDIDO -----* 🔔\n\n';
+   mensagem += separadorPequeno;
    mensagem += '📝 *Itens do pedido:*\n';
    carrinho.forEach(item => {
       mensagem += `  • ${item.nome} x${item.quantidade} - ${item.preco}\n`;
    });
-   
    let subtotal = 0;
    carrinho.forEach(item => { subtotal += item.precoNumero * item.quantidade; });
    mensagem += `\n💵 *Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}\n\n`;
    mensagem += separadorPequeno;
-   
-   mensagem += separadorGrande;
    const tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked');
    if (tipoEntrega.value === 'entrega') {
       mensagem += '📍 *ENTREGA*\n';
@@ -635,28 +629,25 @@ document.getElementById('radioRetirada').addEventListener('change', function() {
       mensagem += `  🏘️ Bairro: ${bairroNome}\n`;
       mensagem += `  🚚 Taxa: R$ ${taxaEntregaSelecionada.toFixed(2).replace('.', ',')}\n`;
       mensagem += `  🏠 Endereço: ${document.getElementById('rua').value}\n`;
-      mensagem += `  👤 Recebe: ${document.getElementById('nomePessoa').value}\n`;
+      mensagem += `  👤 Quem recebe: ${document.getElementById('nomePessoa').value}\n`;
       const referencia = document.getElementById('referencia').value;
-      if (referencia) mensagem += `   📌 Referência: ${referencia}\n`;
+      if (referencia) mensagem += `  📌 Referência: ${referencia}\n`;
    } else {
       mensagem += '🏪 *RETIRADA NO LOCAL*\n';
-      mensagem += `   👤 Nome: ${document.getElementById('nomeRetirada').value}\n`;
+      mensagem += `   👤 Quem retira: ${document.getElementById('nomeRetirada').value}\n`;
    }
-   
-   mensagem += separadorGrande;
+   mensagem += separadorPequeno;
    const total = subtotal + taxaEntregaSelecionada;
    mensagem += `\n💰 *TOTAL:* R$ ${total.toFixed(2).replace('.', ',')}\n\n`;
-   
    mensagem += separadorPequeno;
    const formaPagamento = document.querySelector('input[name="formaPagamento"]:checked');
    const formaTexto = {
       'pix': ' 📲 PIX',
       'debito': ' 💳 Cartão de Débito',
       'credito': ' 💳 Cartão de Crédito',
-      'dinheiro': ' 💵 Dinheiro'
+      'dinheiro': ' 🪙 Dinheiro'
    };
-   mensagem += `🪙 *Pagamento:* ${formaTexto[formaPagamento.value]}`;
-   
+   mensagem += `💵 *Pagamento:* ${formaTexto[formaPagamento.value]}`;
    if (formaPagamento.value === 'dinheiro') {
       const semTroco = document.getElementById('semTroco').checked;
       if (semTroco) {
@@ -666,8 +657,7 @@ document.getElementById('radioRetirada').addEventListener('change', function() {
          mensagem += ` (Troco: R$ ${parseFloat(valorTroco).toFixed(2).replace('.', ',')})`;
       }
    }
-   
-   mensagem += separadorGrande;
+   mensagem += separadorPequeno;
    mensagem += '\n\n✅ _Aguardando confirmação do estabelecimento_';
    
    return mensagem;
