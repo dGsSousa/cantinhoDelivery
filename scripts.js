@@ -45,28 +45,35 @@ function renderizarProdutos() {
 
 function obterNomeCompleto(categoria, nome) {
    if (!categoria) return nome;
-   
+
    const categoriaNorm = categoria.toLowerCase().trim();
-   
+
+   const categoriasExcluidas = [
+      'hamburguer',
+      'combos',
+      'combinados',
+      'bebidas'
+   ];
+
+   if (categoriasExcluidas.includes(categoriaNorm)) {
+      return nome;  // ← Retorna "Combo 2" sem prefixo
+   }
+
    // Mapeia categorias para seus prefixos
    const prefixos = {
       'pizza-salgada': 'Pizza',
       'pizza-doce': 'Pizza',
-      'bebidas': 'Bebida',
-      'hamburguer': 'Hambúrguer',
       'yakisoba': 'Yakisoba',
       'porcoes': 'Porção',
-      'combos': 'Combo',
-      'combinados': 'Combinado',
       'temaki': 'Temaki',
       'makimono': 'Makimono',
       'harumaki': 'Harumaki'
    };
-   
+
    // Busca o prefixo correspondente
    const prefixo = prefixos[categoriaNorm];
-   
-   // Se encontrou prefixo, adiciona ao nome; senão retorna nome puro
+
+   // Se encontrou prefixo E não está na blacklist, adiciona
    return prefixo ? prefixo + ' de ' + nome : nome;
 }
 
@@ -75,7 +82,7 @@ function criarCardProduto(produto) {
    const precoM = produto.preco_m && produto.preco_m !== "" ? Number(produto.preco_m) : null;
    const precoG = produto.preco_g && produto.preco_g !== "" ? Number(produto.preco_g) : null;
    const precoUnico = produto.preco_unico && produto.preco_unico !== "" ? Number(produto.preco_unico) : null;
-   
+
    let textoPreco, textoBotao;
    if (produto.tipo === 'tamanhos') {
       textoPreco = precoP ? 'A partir de R$ ' + precoP.toFixed(2).replace('.', ',') : 'Preço indisponível';
@@ -84,10 +91,10 @@ function criarCardProduto(produto) {
       textoPreco = precoUnico ? 'R$ ' + precoUnico.toFixed(2).replace('.', ',') : 'Preço indisponível';
       textoBotao = '+';
    }
-   
+
    const urlImagem = processarURLImagem(produto.img);
-   
-   return '<div class="produto" data-id="' + produto.id + '" data-categoria="' + produto.categoria + '" data-nome="' + produto.nome + '" data-descricao="' + produto.descricao + '" data-img="' + produto.img + '" data-tipo="' + produto.tipo + '" data-preco-p="' + (precoP || '') + '" data-preco-m="' + (precoM || '') + '" data-preco-g="' + (precoG || '') + '" data-preco-unico="' + (precoUnico || '') + '"><div class="produto-topo"><img src="' + urlImagem + '" alt="' + produto.nome + '" class="produto-img" onerror="this.src=\'images/placeholder.jpg\'"><div class="produto-texto"><h3>' + produto.nome + '</h3><p>' + produto.descricao + '</p></div></div><div class="produto-rodape"><span class="preco">' + textoPreco + '</span><button class="adicionar-carrinho" aria-label="Adicionar ao carrinho">'+textoBotao+'</button></div></div>';
+
+   return '<div class="produto" data-id="' + produto.id + '" data-categoria="' + produto.categoria + '" data-nome="' + produto.nome + '" data-descricao="' + produto.descricao + '" data-img="' + produto.img + '" data-tipo="' + produto.tipo + '" data-preco-p="' + (precoP || '') + '" data-preco-m="' + (precoM || '') + '" data-preco-g="' + (precoG || '') + '" data-preco-unico="' + (precoUnico || '') + '"><div class="produto-topo"><img src="' + urlImagem + '" alt="' + produto.nome + '" class="produto-img" onerror="this.src=\'images/placeholder.jpg\'"><div class="produto-texto"><h3>' + produto.nome + '</h3><p>' + produto.descricao + '</p></div></div><div class="produto-rodape"><span class="preco">' + textoPreco + '</span><button class="adicionar-carrinho" aria-label="Adicionar ao carrinho">' + textoBotao + '</button></div></div>';
 }
 
 function processarURLImagem(img) {
@@ -101,6 +108,35 @@ function processarURLImagem(img) {
    if (driveId) return 'https://drive.google.com/thumbnail?id=' + driveId + '&sz=w400';
    if (img.startsWith('http://') || img.startsWith('https://')) return img;
    return 'images/' + img;
+}
+
+function animarVooParaCarrinho(imagemOrigem) {
+   const origemRect = imagemOrigem.getBoundingClientRect();
+   const carrinhoIcone = document.querySelector('footer img');
+   const carrinhoRect = carrinhoIcone.getBoundingClientRect();
+
+   const clone = imagemOrigem.cloneNode();
+   clone.style.position = 'fixed';
+   clone.style.top = origemRect.top + 'px';
+   clone.style.left = origemRect.left + 'px';
+   clone.style.width = origemRect.width + 'px';
+   clone.style.height = origemRect.height + 'px';
+   clone.style.zIndex = '9999';
+   clone.style.borderRadius = '12px';
+   clone.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+   clone.style.pointerEvents = 'none';
+
+   document.body.appendChild(clone);
+   clone.offsetHeight;
+
+   clone.style.top = carrinhoRect.top + 'px';
+   clone.style.left = carrinhoRect.left + 'px';
+   clone.style.width = '40px';
+   clone.style.height = '40px';
+   clone.style.transform = 'scale(0.2)';
+   clone.style.opacity = '0';
+
+   setTimeout(() => clone.remove(), 800);
 }
 
 // ========== FUNÇÕES DE STATUS ==========
@@ -125,15 +161,15 @@ function verificarStatusLoja() {
    const agora = new Date();
    const minutosAgora = agora.getHours() * 60 + agora.getMinutes();
    const diaAtualNorm = diasNormalizados[agora.getDay()];
-   
+
    const horarioDia = horarios.find(h => normalizarTexto(h.dia) === diaAtualNorm);
    if (!horarioDia) return { aberto: false, texto: 'Fechado' };
-   
+
    const minutosAbertura = horaParaMinutos(horarioDia.abertura);
    const minutosFechamento = horaParaMinutos(horarioDia.fechamento);
-   
+
    if (minutosAbertura === null || minutosFechamento === null) return { aberto: false, texto: 'Fechado' };
-   
+
    const estaAberto = minutosAgora >= minutosAbertura && minutosAgora < minutosFechamento;
    return { aberto: estaAberto, texto: estaAberto ? 'Aberto' : 'Fechado' };
 }
@@ -175,7 +211,7 @@ function alternarVisualizacao() {
    const todasSecoes = document.querySelectorAll('.secao');
    const secaoPesquisaGlobal = document.getElementById('resultadosPesquisaGlobal');
    const temTexto = termoPesquisaGlobal.trim().length > 0;
-   
+
    if (temTexto) {
       modoPesquisaGlobal = true;
       todasSecoes.forEach(secao => { secao.style.display = 'none'; });
@@ -215,21 +251,21 @@ function atualizarTotalComFrete() {
    let subtotal = 0;
    carrinho.forEach(item => { subtotal += item.precoNumero * item.quantidade; });
    const total = subtotal + taxaEntregaSelecionada;
-   
+
    const totalValorEl = document.getElementById('totalValor');
    if (totalValorEl) totalValorEl.textContent = 'R$ ' + subtotal.toFixed(2).replace('.', ',');
-   
+
    const resumoSubtotalEl = document.getElementById('resumoSubtotal');
    const resumoFreteEl = document.getElementById('resumoFrete');
    const resumoTotalEl = document.getElementById('resumoTotal');
-   
+
    if (resumoSubtotalEl) resumoSubtotalEl.textContent = 'R$ ' + subtotal.toFixed(2).replace('.', ',');
    if (resumoFreteEl) resumoFreteEl.textContent = taxaEntregaSelecionada > 0 ? 'R$ ' + taxaEntregaSelecionada.toFixed(2).replace('.', ',') : 'Grátis';
    if (resumoTotalEl) resumoTotalEl.textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
 }
 
 // ========== INICIALIZAÇÃO ==========
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
    const carrinhoPainel = document.getElementById('carrinhoPainel');
    const carrinhoOverlay = document.getElementById('carrinhoOverlay');
    const footerCarrinho = document.querySelector('footer');
@@ -241,18 +277,20 @@ document.addEventListener('DOMContentLoaded', function() {
    const modalNome = document.getElementById('modalNome');
    const modalDescricao = document.getElementById('modalDescricao');
    const selectBairro = document.getElementById('selectBairro');
-   
+
    let produtoAtual = null;
    let tamanhoSelecionado = null;
-   
+
    // Funções do carrinho
-   function abrirCarrinho() { carrinhoPainel.classList.add('aberto'); carrinhoOverlay.classList.add('ativo'); document.body.style.overflow = 'hidden';
+   function abrirCarrinho() {
+      carrinhoPainel.classList.add('aberto'); carrinhoOverlay.classList.add('ativo'); document.body.style.overflow = 'hidden';
       atualizarCarrinho();
-    }
-   function fecharCarrinho() { carrinhoPainel.classList.remove('aberto'); carrinhoOverlay.classList.remove('ativo'); document.body.style.overflow = '';
+   }
+   function fecharCarrinho() {
+      carrinhoPainel.classList.remove('aberto'); carrinhoOverlay.classList.remove('ativo'); document.body.style.overflow = '';
       voltarParaEtapa1();
-    }
-   
+   }
+
    function atualizarCarrinho() {
       const carrinhoItens = document.getElementById('carrinhoItens');
       const carrinhoVazio = document.getElementById('carrinhoVazio');
@@ -269,26 +307,26 @@ document.addEventListener('DOMContentLoaded', function() {
       carrinho.forEach(item => {
          total += item.precoNumero * item.quantidade;
          quantidadeTotal += item.quantidade;
-         carrinhoItens.innerHTML += '<div class="item-carrinho" data-id="'+item.id+'"><img src="'+item.img+'" alt="'+item.nome+'" onerror="this.src=\'images/placeholder.jpg\'"><div class="item-info"><h4>'+item.nome+'</h4><p class="item-preco">'+item.preco+'</p><div class="item-quantidade"><button class="btn-quantidade" data-acao="diminuir" data-id="'+item.id+'">-</button><span class="quantidade-numero">'+item.quantidade+'</span><button class="btn-quantidade" data-acao="aumentar" data-id="'+item.id+'">+</button></div></div><button class="remover-item" data-id="'+item.id+'">🗑️</button></div>';
+         carrinhoItens.innerHTML += '<div class="item-carrinho" data-id="' + item.id + '"><img src="' + item.img + '" alt="' + item.nome + '" onerror="this.src=\'images/placeholder.jpg\'"><div class="item-info"><h4>' + item.nome + '</h4><p class="item-preco">' + item.preco + '</p><div class="item-quantidade"><button class="btn-quantidade" data-acao="diminuir" data-id="' + item.id + '">-</button><span class="quantidade-numero">' + item.quantidade + '</span><button class="btn-quantidade" data-acao="aumentar" data-id="' + item.id + '">+</button></div></div><button class="remover-item" data-id="' + item.id + '">🗑️</button></div>';
       });
       totalValor.textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
-      footerCarrinho.innerHTML = '<a href="#carrinho">('+quantidadeTotal+') Meu Carrinho <img src="icons/carrinho-icon.png"></a>';
+      footerCarrinho.innerHTML = '<a href="#carrinho">(' + quantidadeTotal + ') Meu Carrinho <img src="icons/carrinho-icon.png"></a>';
    }
-   
+
    function abrirModalTamanhos(produtoElement) {
       // Coleta dados do produto
-      produtoAtual = { 
+      produtoAtual = {
          id: produtoElement.dataset.id,
-         categoria: produtoElement.dataset.categoria, 
-         nome: produtoElement.dataset.nome, 
-         descricao: produtoElement.dataset.descricao, 
-         img: produtoElement.dataset.img, 
-         precoP: parseFloat(produtoElement.dataset.precoP) || null, 
-         precoM: parseFloat(produtoElement.dataset.precoM) || null, 
+         categoria: produtoElement.dataset.categoria,
+         nome: produtoElement.dataset.nome,
+         descricao: produtoElement.dataset.descricao,
+         img: produtoElement.dataset.img,
+         precoP: parseFloat(produtoElement.dataset.precoP) || null,
+         precoM: parseFloat(produtoElement.dataset.precoM) || null,
          precoG: parseFloat(produtoElement.dataset.precoG) || null
       };
       tamanhoSelecionado = null;
-      
+
       // ========== FILTRAGEM DE TAMANHOS VÁLIDOS ==========
       // Cria array com TODOS os tamanhos possíveis
       const todosTamanhos = [
@@ -296,99 +334,99 @@ document.addEventListener('DOMContentLoaded', function() {
          { letra: 'M', nome: 'Médio', preco: produtoAtual.precoM },
          { letra: 'G', nome: 'Grande', preco: produtoAtual.precoG }
       ];
-      
+
       // FILTRA: Remove tamanhos sem preço (null, undefined, 0, NaN)
       const tamanhosValidos = todosTamanhos.filter(tamanho => {
          // Retorna true apenas se o preço for um número válido maior que zero
          return tamanho.preco && !isNaN(tamanho.preco) && tamanho.preco > 0;
       });
-      
+
       // Atualiza imagem do modal
       const urlImagem = processarURLImagem(produtoAtual.img);
-      modalImg.src = urlImagem; 
-      modalImg.alt = produtoAtual.nome; 
-      modalImg.onerror = function() { this.src = 'images/placeholder.jpg'; };
-      
+      modalImg.src = urlImagem;
+      modalImg.alt = produtoAtual.nome;
+      modalImg.onerror = function () { this.src = 'images/placeholder.jpg'; };
+
       // Atualiza textos
-      modalNome.textContent = produtoAtual.nome; 
+      modalNome.textContent = produtoAtual.nome;
       modalDescricao.textContent = produtoAtual.descricao;
-      
+
       // ========== RENDERIZAÇÃO DINÂMICA DOS BOTÕES ==========
       const containerOpcoes = document.querySelector('.modal-tamanho-opcoes');
       containerOpcoes.innerHTML = ''; // Limpa botões anteriores
-      
+
       // Renderiza APENAS os tamanhos válidos
       tamanhosValidos.forEach(tamanho => {
          const botao = document.createElement('button');
          botao.className = 'btn-tamanho';
          botao.dataset.tamanho = tamanho.letra;
          botao.innerHTML = '<span class="tamanho-letra">' + tamanho.letra + '</span>' +
-                          '<span class="tamanho-preco">R$ ' + tamanho.preco.toFixed(2).replace('.', ',') + '</span>';
-         
+            '<span class="tamanho-preco">R$ ' + tamanho.preco.toFixed(2).replace('.', ',') + '</span>';
+
          // Event listener para seleção
-         botao.addEventListener('click', function() {
+         botao.addEventListener('click', function () {
             document.querySelectorAll('.btn-tamanho').forEach(b => b.classList.remove('selecionado'));
             this.classList.add('selecionado');
             tamanhoSelecionado = this.dataset.tamanho;
          });
-         
+
          containerOpcoes.appendChild(botao);
       });
-      
+
       // Abre modal
-      modalOverlay.classList.add('ativo'); 
-      modalTamanhos.classList.add('ativo'); 
+      modalOverlay.classList.add('ativo');
+      modalTamanhos.classList.add('ativo');
       document.body.style.overflow = 'hidden';
    }
-   
+
    function fecharModalTamanhos() { modalOverlay.classList.remove('ativo'); modalTamanhos.classList.remove('ativo'); document.body.style.overflow = ''; produtoAtual = null; tamanhoSelecionado = null; }
-   
+
    function irParaEtapa2() {
       if (carrinho.length === 0) { alert('Adicione produtos ao carrinho!'); return; }
       document.getElementById('etapa1').style.display = 'none'; document.getElementById('etapa2').style.display = 'flex';
       document.getElementById('tituloCarrinho').textContent = 'Finalizar Pedido'; document.getElementById('voltarCarrinho').style.display = 'flex';
       atualizarResumoPedido();
    }
-   
+
    function voltarParaEtapa1() { document.getElementById('etapa2').style.display = 'none'; document.getElementById('etapa1').style.display = 'flex'; document.getElementById('tituloCarrinho').textContent = 'Meu Carrinho'; document.getElementById('voltarCarrinho').style.display = 'none'; }
-   
+
    function atualizarResumoPedido() {
       const resumoItens = document.getElementById('resumoItens');
       if (!resumoItens) return;
       resumoItens.innerHTML = '';
       carrinho.forEach(item => {
          const sub = item.precoNumero * item.quantidade;
-         resumoItens.innerHTML += '<div class="resumo-item"><span>'+item.quantidade+'x '+item.nome+'</span><span>R$ '+sub.toFixed(2).replace('.', ',')+'</span></div>';
+         resumoItens.innerHTML += '<div class="resumo-item"><span>' + item.quantidade + 'x ' + item.nome + '</span><span>R$ ' + sub.toFixed(2).replace('.', ',') + '</span></div>';
       });
       atualizarTotalComFrete();
    }
-   
+
    function validarFormulario() {
-   let valido = true; 
-   let mensagensErro = [];
-   document.querySelectorAll('.erro').forEach(el => { el.classList.remove('erro'); });
-   
-   const tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked');
-   if (!tipoEntrega) { mensagensErro.push('Selecione o tipo de entrega'); valido = false; }
-   
-   // VALIDAÇÃO ENTREGA
-   if (tipoEntrega && tipoEntrega.value === 'entrega') {
-      const rua = document.getElementById('rua'); 
-      const nomePessoa = document.getElementById('nomePessoa');
-      if (!rua.value.trim()) { rua.classList.add('erro'); mensagensErro.push('Preencha o endereço'); valido = false; }
-      if (!nomePessoa.value.trim()) { nomePessoa.classList.add('erro'); mensagensErro.push('Preencha o nome'); valido = false; }
-      if (selectBairro && !selectBairro.value) { selectBairro.classList.add('erro'); mensagensErro.push('Selecione o bairro'); valido = false; }
-   }
-   
-   // 🆕 VALIDAÇÃO RETIRADA
-   if (tipoEntrega && tipoEntrega.value === 'retirada') {
-      const nomeRetirada = document.getElementById('nomeRetirada');
-      if (!nomeRetirada.value.trim()) { 
-         nomeRetirada.classList.add('erro'); 
-         mensagensErro.push('Preencha o nome para retirada'); 
-         valido = false; 
+      let valido = true;
+      let mensagensErro = [];
+      document.querySelectorAll('.erro').forEach(el => { el.classList.remove('erro'); });
+
+      const tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked');
+      if (!tipoEntrega) { mensagensErro.push('Selecione o tipo de entrega'); valido = false; }
+
+      // VALIDAÇÃO ENTREGA
+      if (tipoEntrega && tipoEntrega.value === 'entrega') {
+         const rua = document.getElementById('rua');
+         const nomePessoa = document.getElementById('nomePessoa');
+         if (!rua.value.trim()) { rua.classList.add('erro'); mensagensErro.push('Preencha o endereço'); valido = false; }
+         if (!nomePessoa.value.trim()) { nomePessoa.classList.add('erro'); mensagensErro.push('Preencha o nome'); valido = false; }
+         if (selectBairro && !selectBairro.value) { selectBairro.classList.add('erro'); mensagensErro.push('Selecione o bairro'); valido = false; }
       }
-   }
+
+      // 🆕 VALIDAÇÃO RETIRADA
+      if (tipoEntrega && tipoEntrega.value === 'retirada') {
+         const nomeRetirada = document.getElementById('nomeRetirada');
+         if (!nomeRetirada.value.trim()) {
+            nomeRetirada.classList.add('erro');
+            mensagensErro.push('Preencha o nome para retirada');
+            valido = false;
+         }
+      }
       const formaPagamento = document.querySelector('input[name="formaPagamento"]:checked');
       if (!formaPagamento) { mensagensErro.push('Selecione a forma de pagamento'); valido = false; }
       if (formaPagamento && formaPagamento.value === 'dinheiro') {
@@ -398,51 +436,51 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!valido) alert('Preencha todos os campos:\n\n' + mensagensErro.join('\n'));
       return valido;
    }
-   
+
    function finalizarPedido() {
-   if (!validarFormulario()) return;
-   
-   // Envia para WhatsApp
-   enviarParaWhatsApp();
-   
-   // Limpa carrinho
-   carrinho = []; 
-   taxaEntregaSelecionada = 0;
-   atualizarCarrinho(); 
-   fecharCarrinho(); 
-   voltarParaEtapa1();
-   
-   // Limpa formulário
-   document.querySelectorAll('input[type="radio"]').forEach(r => { r.checked = false; });
-   document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(i => { i.value = ''; i.classList.remove('erro'); });
-   document.getElementById('semTroco').checked = false;
-   document.getElementById('secaoEndereco').style.display = 'none'; 
-   document.getElementById('secaoTroco').style.display = 'none';
-   document.getElementById('secaoRetirada').style.display = 'none';
-   document.getElementById('nomeRetirada').value = '';
-   const selectBairro = document.getElementById('selectBairro');
-   if (selectBairro) selectBairro.selectedIndex = 0;
-   atualizarTotalComFrete();
-}
-   
+      if (!validarFormulario()) return;
+
+      // Envia para WhatsApp
+      enviarParaWhatsApp();
+
+      // Limpa carrinho
+      carrinho = [];
+      taxaEntregaSelecionada = 0;
+      atualizarCarrinho();
+      fecharCarrinho();
+      voltarParaEtapa1();
+
+      // Limpa formulário
+      document.querySelectorAll('input[type="radio"]').forEach(r => { r.checked = false; });
+      document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(i => { i.value = ''; i.classList.remove('erro'); });
+      document.getElementById('semTroco').checked = false;
+      document.getElementById('secaoEndereco').style.display = 'none';
+      document.getElementById('secaoTroco').style.display = 'none';
+      document.getElementById('secaoRetirada').style.display = 'none';
+      document.getElementById('nomeRetirada').value = '';
+      const selectBairro = document.getElementById('selectBairro');
+      if (selectBairro) selectBairro.selectedIndex = 0;
+      atualizarTotalComFrete();
+   }
+
    // Event listeners - Pesquisa
-   inputPesquisa.addEventListener('input', function(e) {
+   inputPesquisa.addEventListener('input', function (e) {
       termoPesquisaGlobal = e.target.value;
       btnLimparPesquisa.style.display = termoPesquisaGlobal.length > 0 ? 'flex' : 'none';
       alternarVisualizacao();
    });
-   
-   btnLimparPesquisa.addEventListener('click', function() {
+
+   btnLimparPesquisa.addEventListener('click', function () {
       inputPesquisa.value = '';
       termoPesquisaGlobal = '';
       btnLimparPesquisa.style.display = 'none';
       alternarVisualizacao();
       inputPesquisa.focus();
    });
-   
+
    // Event listeners - Navegação
    document.querySelectorAll('.categoria-link').forEach(link => {
-      link.addEventListener('click', function(e) {
+      link.addEventListener('click', function (e) {
          e.preventDefault();
          if (modoPesquisaGlobal) { inputPesquisa.value = ''; termoPesquisaGlobal = ''; btnLimparPesquisa.style.display = 'none'; }
          const secaoId = this.getAttribute('href').substring(1);
@@ -454,9 +492,9 @@ document.addEventListener('DOMContentLoaded', function() {
          this.classList.add('ativo');
       });
    });
-   
+
    document.querySelectorAll('.subcategoria-card').forEach(link => {
-      link.addEventListener('click', function(e) {
+      link.addEventListener('click', function (e) {
          e.preventDefault();
          if (modoPesquisaGlobal) { inputPesquisa.value = ''; termoPesquisaGlobal = ''; btnLimparPesquisa.style.display = 'none'; }
          const produtoId = this.getAttribute('href').substring(1);
@@ -466,46 +504,101 @@ document.addEventListener('DOMContentLoaded', function() {
          if (secao) { secao.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
       });
    });
-   
+
    // Event listeners - Carrinho
    footerCarrinho.addEventListener('click', e => { e.preventDefault(); abrirCarrinho(); });
    document.getElementById('fecharCarrinho').addEventListener('click', fecharCarrinho);
    carrinhoOverlay.addEventListener('click', fecharCarrinho);
-   
+
    // Event listeners - Modal
    document.getElementById('modalFechar').addEventListener('click', fecharModalTamanhos);
    modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) fecharModalTamanhos(); });
    modalTamanhos.addEventListener('click', e => { e.stopPropagation(); });
-   
-   document.getElementById('modalAdicionar').addEventListener('click', function() {
+
+   document.getElementById('modalAdicionar').addEventListener('click', function () {
       if (!tamanhoSelecionado) { alert('Escolha um tamanho!'); return; }
+
+      // Pega referência do botão para animar
+      const botao = this;
+
+      // ========== ANIMAÇÃO 1: POP NO BOTÃO ==========
+      botao.classList.add('animando');
+
+      // ========== ANIMAÇÃO 2: ÍCONE DE CHECK ==========
+      // Cria elemento do check temporário
+      const checkIcon = document.createElement('span');
+      checkIcon.className = 'check-icon';
+      checkIcon.textContent = '✅';
+      botao.appendChild(checkIcon);
+
+      // ========== LÓGICA DE ADICIONAR AO CARRINHO (mantém igual) ==========
       let precoNumero;
       if (tamanhoSelecionado === 'P') precoNumero = produtoAtual.precoP;
       else if (tamanhoSelecionado === 'M') precoNumero = produtoAtual.precoM;
       else precoNumero = produtoAtual.precoG;
-      const produto = { id: Date.now(), nome: obterNomeCompleto(produtoAtual.categoria, produtoAtual.nome) + ' (' + tamanhoSelecionado + ')', tamanho: tamanhoSelecionado, preco: 'R$ ' + precoNumero.toFixed(2).replace('.', ','), precoNumero: precoNumero, img: processarURLImagem(produtoAtual.img), quantidade: 1 };
+
+      const produto = {
+         id: Date.now(),
+         nome: obterNomeCompleto(produtoAtual.categoria, produtoAtual.nome) + ' (' + tamanhoSelecionado + ')',
+         tamanho: tamanhoSelecionado,
+         preco: 'R$ ' + precoNumero.toFixed(2).replace('.', ','),
+         precoNumero: precoNumero,
+         img: processarURLImagem(produtoAtual.img),
+         quantidade: 1
+      };
+
       const existente = carrinho.find(i => i.nome === produto.nome && i.tamanho === produto.tamanho);
       if (existente) existente.quantidade++;
       else carrinho.push(produto);
-      atualizarCarrinho(); fecharModalTamanhos();
+
+      atualizarCarrinho();
+
+      // VOO DA IMAGEM DO MODAL
+      const imagemModal = document.getElementById('modalImg');
+      animarVooParaCarrinho(imagemModal);
+
+      // ========== ANIMAÇÃO 3: SHAKE NO CARRINHO ==========
+      const footerCarrinho = document.querySelector('footer');
+      footerCarrinho.classList.add('shake');
+
+      // Remove classe após animação terminar
+      setTimeout(() => {
+         footerCarrinho.classList.remove('shake');
+      }, 500);
+
+      // ========== ANIMAÇÃO 4: FADE-OUT DO MODAL ==========
+      // Adiciona classe de fechamento ao modal e overlay
+      modalTamanhos.classList.add('fechando');
+      modalOverlay.classList.add('fechando');
+
+      // Aguarda animação terminar antes de fechar de verdade
+      setTimeout(() => {
+         fecharModalTamanhos();
+
+         // Limpa as classes e o ícone de check
+         botao.classList.remove('animando');
+         checkIcon.remove();
+         modalTamanhos.classList.remove('fechando');
+         modalOverlay.classList.remove('fechando');
+      }, 600);  // 600ms = duração da animação modalFadeOut
    });
-   
+
    // Event listeners - Adicionar produtos
-   document.body.addEventListener('click', function(e) {
+   document.body.addEventListener('click', function (e) {
       if (e.target.classList.contains('adicionar-carrinho')) {
-         const produtoDiv = e.target.closest('.produto'); 
+         const produtoDiv = e.target.closest('.produto');
          if (!produtoDiv) return;
          if (produtoDiv.dataset.tipo === 'tamanhos') { abrirModalTamanhos(produtoDiv); return; }
 
          // ========== 🆕 ANIMAÇÃO DO CARD ==========
          // Adiciona classe de animação ao card inteiro
          produtoDiv.classList.add('animando-adicao');
-         
+
          // Remove a classe após a animação terminar (0.6s conforme CSS)
          setTimeout(() => {
             produtoDiv.classList.remove('animando-adicao');
          }, 600);
-         
+
          // Adiciona classe ao botão
          e.target.classList.add('adicionado');
 
@@ -513,43 +606,25 @@ document.addEventListener('DOMContentLoaded', function() {
          const existente = carrinho.find(i => i.nome === produto.nome);
          if (existente) existente.quantidade++;
          else carrinho.push(produto);
+
          atualizarCarrinho();
 
+         // Shake no carrinho
+         const footerCarrinho = document.querySelector('footer');
+         footerCarrinho.classList.add('shake');
+         setTimeout(() => {
+            footerCarrinho.classList.remove('shake');
+         }, 500);
+
          e.target.style.backgroundColor = '#4CAF50';
-         setTimeout(() => { 
-               e.target.style.backgroundColor = '#ff4747'; 
-               e.target.classList.remove('adicionado');  // ← remove classe do botão
+         setTimeout(() => {
+            e.target.style.backgroundColor = '#ff4747';
+            e.target.classList.remove('adicionado');  // ← remove classe do botão
          }, 1000);
 
-         // Pega posição do produto
-         const produtoRect = produtoDiv.getBoundingClientRect();
-
-         // Pega posição do ícone do carrinho no footer
-         const carrinhoIcone = document.querySelector('footer img');
-         const carrinhoRect = carrinhoIcone.getBoundingClientRect();
-
-         // Cria clone da imagem
-         const clone = produtoDiv.querySelector('img').cloneNode();
-         clone.style.position = 'fixed';
-         clone.style.top = produtoRect.top + 'px';
-         clone.style.left = produtoRect.left + 'px';
-         clone.style.width = '80px';
-         clone.style.zIndex = '9999';
-         clone.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-         document.body.appendChild(clone);
-
-         // Força reflow para a transição funcionar
-         clone.offsetHeight;
-
-         // Move para o carrinho
-         clone.style.top = carrinhoRect.top + 'px';
-         clone.style.left = carrinhoRect.left + 'px';
-         clone.style.transform = 'scale(0.2)';
-         clone.style.opacity = '0';
-
-         // Remove após animação
-         setTimeout(() => clone.remove(), 800);
-               }
+         const imagemProduto = produtoDiv.querySelector('img');
+         animarVooParaCarrinho(imagemProduto);
+      }
 
       if (e.target.classList.contains('btn-quantidade')) {
          const id = parseInt(e.target.dataset.id); const item = carrinho.find(i => i.id === id); if (!item) return;
@@ -559,109 +634,109 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       if (e.target.classList.contains('remover-item')) { carrinho = carrinho.filter(i => i.id !== parseInt(e.target.dataset.id)); atualizarCarrinho(); }
    });
-   
-   // Event listener - ENTREGA
-document.getElementById('radioEntrega').addEventListener('change', function() { 
-   if (this.checked) { 
-      // EXIBE seção de endereço
-      document.getElementById('secaoEndereco').style.display = 'block';
-      
-      // OCULTA seção de retirada
-      document.getElementById('secaoRetirada').style.display = 'none';
-      
-      // Limpa campo de retirada
-      document.getElementById('nomeRetirada').value = '';
-      
-      // Atualiza total (pode ter taxa de frete)
-      atualizarTotalComFrete(); 
-   } 
-});
 
-// Event listener - RETIRADA
-document.getElementById('radioRetirada').addEventListener('change', function() {
-   if (this.checked) {
-      // OCULTA seção de endereço
-      document.getElementById('secaoEndereco').style.display = 'none';
-      
-      // EXIBE seção de retirada
-      document.getElementById('secaoRetirada').style.display = 'block';
-      
-      // Limpa campos de endereço
-      document.getElementById('rua').value = ''; 
-      document.getElementById('nomePessoa').value = ''; 
-      document.getElementById('referencia').value = '';
-      
-      // Zera taxa (retirada não tem frete)
-      taxaEntregaSelecionada = 0; 
-      const selectBairro = document.getElementById('selectBairro');
-      if (selectBairro) selectBairro.selectedIndex = 0;
-      
-      // Atualiza total
-      atualizarTotalComFrete();
-   }
-});
-   
+   // Event listener - ENTREGA
+   document.getElementById('radioEntrega').addEventListener('change', function () {
+      if (this.checked) {
+         // EXIBE seção de endereço
+         document.getElementById('secaoEndereco').style.display = 'block';
+
+         // OCULTA seção de retirada
+         document.getElementById('secaoRetirada').style.display = 'none';
+
+         // Limpa campo de retirada
+         document.getElementById('nomeRetirada').value = '';
+
+         // Atualiza total (pode ter taxa de frete)
+         atualizarTotalComFrete();
+      }
+   });
+
+   // Event listener - RETIRADA
+   document.getElementById('radioRetirada').addEventListener('change', function () {
+      if (this.checked) {
+         // OCULTA seção de endereço
+         document.getElementById('secaoEndereco').style.display = 'none';
+
+         // EXIBE seção de retirada
+         document.getElementById('secaoRetirada').style.display = 'block';
+
+         // Limpa campos de endereço
+         document.getElementById('rua').value = '';
+         document.getElementById('nomePessoa').value = '';
+         document.getElementById('referencia').value = '';
+
+         // Zera taxa (retirada não tem frete)
+         taxaEntregaSelecionada = 0;
+         const selectBairro = document.getElementById('selectBairro');
+         if (selectBairro) selectBairro.selectedIndex = 0;
+
+         // Atualiza total
+         atualizarTotalComFrete();
+      }
+   });
+
    if (selectBairro) {
-      selectBairro.addEventListener('change', function() {
+      selectBairro.addEventListener('change', function () {
          taxaEntregaSelecionada = parseFloat(this.value) || 0;
          atualizarTotalComFrete();
       });
    }
 
    function gerarMensagemWhatsApp() {
-   const separadorPequeno = '\n- - - - - - - - - - - - - - - - -\n';
+      const separadorPequeno = '\n- - - - - - - - - - - - - - - - -\n';
 
-   let mensagem = '🔔 *----- NOVO PEDIDO -----* 🔔\n\n';
-   mensagem += separadorPequeno;
-   mensagem += '📝 *Itens do pedido:*\n';
-   carrinho.forEach(item => {
-      mensagem += `  • ${item.nome} x${item.quantidade} - ${item.preco}\n`;
-   });
-   let subtotal = 0;
-   carrinho.forEach(item => { subtotal += item.precoNumero * item.quantidade; });
-   mensagem += `\n💵 *Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}\n\n`;
-   mensagem += separadorPequeno;
-   const tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked');
-   if (tipoEntrega.value === 'entrega') {
-      mensagem += '📍 *ENTREGA*\n';
-      const bairroSelect = document.getElementById('selectBairro');
-      const bairroNome = bairroSelect.options[bairroSelect.selectedIndex].dataset.nome;
-      mensagem += `  🏘️ Bairro: ${bairroNome}\n`;
-      mensagem += `  🚚 Taxa: R$ ${taxaEntregaSelecionada.toFixed(2).replace('.', ',')}\n`;
-      mensagem += `  🏠 Endereço: ${document.getElementById('rua').value}\n`;
-      mensagem += `  👤 Quem recebe: ${document.getElementById('nomePessoa').value}\n`;
-      const referencia = document.getElementById('referencia').value;
-      if (referencia) mensagem += `  📌 Referência: ${referencia}\n`;
-   } else {
-      mensagem += '🏪 *RETIRADA NO LOCAL*\n';
-      mensagem += `   👤 Quem retira: ${document.getElementById('nomeRetirada').value}\n`;
-   }
-   mensagem += separadorPequeno;
-   const total = subtotal + taxaEntregaSelecionada;
-   mensagem += `\n💰 *TOTAL:* R$ ${total.toFixed(2).replace('.', ',')}\n\n`;
-   mensagem += separadorPequeno;
-   const formaPagamento = document.querySelector('input[name="formaPagamento"]:checked');
-   const formaTexto = {
-      'pix': ' 📲 PIX',
-      'debito': ' 💳 Cartão de Débito',
-      'credito': ' 💳 Cartão de Crédito',
-      'dinheiro': ' 🪙 Dinheiro'
-   };
-   mensagem += `💵 *Pagamento:* ${formaTexto[formaPagamento.value]}`;
-   if (formaPagamento.value === 'dinheiro') {
-      const semTroco = document.getElementById('semTroco').checked;
-      if (semTroco) {
-         mensagem += ' (Sem troco)';
+      let mensagem = '🔔 *----- NOVO PEDIDO -----* 🔔';
+      mensagem += separadorPequeno;
+      mensagem += '📝 *Itens do pedido:*\n';
+      carrinho.forEach(item => {
+         mensagem += `  • ${item.nome} x${item.quantidade} - ${item.preco}\n`;
+      });
+      let subtotal = 0;
+      carrinho.forEach(item => { subtotal += item.precoNumero * item.quantidade; });
+      mensagem += `\n💵 *Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+      mensagem += separadorPequeno;
+      const tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked');
+      if (tipoEntrega.value === 'entrega') {
+         mensagem += '📍 *ENTREGA*\n';
+         const bairroSelect = document.getElementById('selectBairro');
+         const bairroNome = bairroSelect.options[bairroSelect.selectedIndex].dataset.nome;
+         mensagem += `  🏘️ Bairro: ${bairroNome}\n`;
+         mensagem += `  🚚 Taxa: R$ ${taxaEntregaSelecionada.toFixed(2).replace('.', ',')}\n`;
+         mensagem += `  🏠 Endereço: ${document.getElementById('rua').value}\n`;
+         mensagem += `  👤 Quem recebe: ${document.getElementById('nomePessoa').value}\n`;
+         const referencia = document.getElementById('referencia').value;
+         if (referencia) mensagem += `  📌 Referência: ${referencia}`;
       } else {
-         const valorTroco = document.getElementById('valorTroco').value;
-         mensagem += ` (Troco: R$ ${parseFloat(valorTroco).toFixed(2).replace('.', ',')})`;
+         mensagem += '🏪 *RETIRADA NO LOCAL*\n';
+         mensagem += `   👤 Quem retira: ${document.getElementById('nomeRetirada').value}`;
       }
+      mensagem += separadorPequeno;
+      const total = subtotal + taxaEntregaSelecionada;
+      mensagem += `💰 *TOTAL:* R$ ${total.toFixed(2).replace('.', ',')}`;
+      mensagem += separadorPequeno;
+      const formaPagamento = document.querySelector('input[name="formaPagamento"]:checked');
+      const formaTexto = {
+         'pix': ' 📲 PIX',
+         'debito': ' 💳 Cartão de Débito',
+         'credito': ' 💳 Cartão de Crédito',
+         'dinheiro': ' 🪙 Dinheiro'
+      };
+      mensagem += `💵 *Pagamento:* ${formaTexto[formaPagamento.value]}`;
+      if (formaPagamento.value === 'dinheiro') {
+         const semTroco = document.getElementById('semTroco').checked;
+         if (semTroco) {
+            mensagem += ' (Sem troco)';
+         } else {
+            const valorTroco = document.getElementById('valorTroco').value;
+            mensagem += ` (Troco: R$ ${parseFloat(valorTroco).toFixed(2).replace('.', ',')})`;
+         }
+      }
+      mensagem += separadorPequeno;
+      mensagem += '✅ _Aguardando confirmação do estabelecimento_';
+
+      return mensagem;
    }
-   mensagem += separadorPequeno;
-   mensagem += '\n\n✅ _Aguardando confirmação do estabelecimento_';
-   
-   return mensagem;
-}
 
    function enviarParaWhatsApp() {
       const mensagem = gerarMensagemWhatsApp();
@@ -669,17 +744,17 @@ document.getElementById('radioRetirada').addEventListener('change', function() {
       const urlWhatsApp = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensagemCodificada}`;
       window.open(urlWhatsApp, '_blank');
    }
-   
-   document.getElementById('radioDinheiro').addEventListener('change', function() { if (this.checked) document.getElementById('secaoTroco').style.display = 'block'; });
+
+   document.getElementById('radioDinheiro').addEventListener('change', function () { if (this.checked) document.getElementById('secaoTroco').style.display = 'block'; });
    ['radioPix', 'radioDebito', 'radioCredito'].forEach(id => {
-      document.getElementById(id).addEventListener('change', function() { if (this.checked) { document.getElementById('secaoTroco').style.display = 'none'; document.getElementById('valorTroco').value = ''; document.getElementById('semTroco').checked = false; } });
+      document.getElementById(id).addEventListener('change', function () { if (this.checked) { document.getElementById('secaoTroco').style.display = 'none'; document.getElementById('valorTroco').value = ''; document.getElementById('semTroco').checked = false; } });
    });
-   document.getElementById('semTroco').addEventListener('change', function() { document.getElementById('valorTroco').disabled = this.checked; if (this.checked) document.getElementById('valorTroco').value = ''; });
-   
+   document.getElementById('semTroco').addEventListener('change', function () { document.getElementById('valorTroco').disabled = this.checked; if (this.checked) document.getElementById('valorTroco').value = ''; });
+
    document.getElementById('continuarPedido').addEventListener('click', irParaEtapa2);
    document.getElementById('voltarCarrinho').addEventListener('click', voltarParaEtapa1);
    document.getElementById('finalizarPedido').addEventListener('click', finalizarPedido);
-   
+
    // Carrega dados
    buscarDados().then(sucesso => {
       if (!sucesso) return;

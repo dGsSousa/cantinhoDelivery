@@ -151,7 +151,7 @@ header img {
    scrollbar-width: none;
    -ms-overflow-style: none;
    width: 100%;
-   padding: 20px 0 10px 10px;
+   padding: 10px 0 15px 10px;
    display: flex;
    gap: 10px;
 }
@@ -168,6 +168,7 @@ header img {
    height: 50px;
    transition: all 0.3s ease;
    flex-shrink: 0;
+   margin-right: 3px;
 }
 
 .categoria-link.ativo {
@@ -1082,4 +1083,84 @@ footer img {
 
 .adicionar-carrinho.adicionado {
    animation: pulsoBotao 0.4s ease-in-out;
+}
+
+/* ========== ANIMAÇÕES DE FEEDBACK ========== */
+
+/* Animação 1: Botão cresce e volta (Pop) */
+@keyframes botaoPop {
+   0% {
+      transform: scale(1);
+   }
+   50% {
+      transform: scale(1.1);
+   }
+   100% {
+      transform: scale(1);
+   }
+}
+
+/* Animação 2: Ícone de check aparece */
+@keyframes checkAparecer {
+   0% {
+      opacity: 0;
+      transform: scale(0.5);
+   }
+   50% {
+      opacity: 1;
+      transform: scale(1.2);
+   }
+   100% {
+      opacity: 1;
+      transform: scale(1);
+   }
+}
+
+/* Animação 3: Modal some com fade-out */
+@keyframes modalFadeOut {
+   0% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+   }
+   100% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.95);
+   }
+}
+
+/* Animação 4: Carrinho no footer dá uma tremidinha */
+@keyframes carrinhoShake {
+   0%, 100% {
+      transform: translateX(0);
+   }
+   25% {
+      transform: translateX(-5px);
+   }
+   75% {
+      transform: translateX(5px);
+   }
+}
+
+/* Classes que serão aplicadas via JS */
+.modal-adicionar.animando {
+   animation: botaoPop 0.3s ease-out;
+}
+
+.modal-adicionar .check-icon {
+   position: absolute;
+   right: 15px;
+   font-size: 1.3em;
+   animation: checkAparecer 0.4s ease-out;
+}
+
+.modal-tamanhos.fechando {
+   animation: modalFadeOut 0.3s ease-out forwards;
+}
+
+.modal-overlay.fechando {
+   animation: modalFadeOut 0.3s ease-out forwards;
+}
+
+footer.shake {
+   animation: carrinhoShake 0.5s ease-in-out;
 }
