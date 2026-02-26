@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-/* ========== RESET E BASE ========== */
 * {
    margin: 0;
    padding: 0;
@@ -12,7 +11,6 @@ body {
    background-color: #f3f3f3;
 }
 
-/* ========== HEADER ========== */
 header {
    display: flex;
    align-items: center;
@@ -26,7 +24,6 @@ header img {
    margin-bottom: 10px;
 }
 
-/* Status aberto/fechado */
 .status-loja {
    display: inline-flex;
    align-items: center;
@@ -68,7 +65,6 @@ header img {
    70% { box-shadow: 0 0 0 4px rgba(67, 160, 71, 0); }
 }
 
-/* ========== TOPO FIXO ========== */
 .topo-fixo {
    position: sticky;
    top: 0;
@@ -93,7 +89,6 @@ header img {
 .topo-fixo h1 { margin-top: 10px; }
 .topo-fixo h2 { margin-bottom: 10px; }
 
-/* ========== BARRA DE PESQUISA ========== */
 .pesquisa-container {
    position: relative;
    width: 90%;
@@ -144,7 +139,6 @@ header img {
    color: #ff4747;
 }
 
-/* ========== MENU HORIZONTAL ========== */
 .opcoes {
    overflow-x: auto;
    overflow-y: hidden;
@@ -182,7 +176,6 @@ header img {
    height: 27px;
 }
 
-/* ========== SEÇÕES E PRODUTOS ========== */
 .secao { padding-bottom: 60px; }
 
 .lista-produtos {
@@ -192,7 +185,6 @@ header img {
    padding: 20px;
 }
 
-/* ========== CARDS DE PRODUTOS - HORIZONTAL ========== */
 .produto {
    background-color: white;
    border-radius: 12px;
@@ -299,7 +291,6 @@ header img {
    transform: scale(0.95);
 }
 
-/* ========== PESQUISA GLOBAL ========== */
 .secao-pesquisa-global {
    padding: 20px;
    padding-bottom: 80px;
@@ -353,7 +344,6 @@ header img {
    font-size: 1em;
 }
 
-/* ========== SUBCATEGORIAS ========== */
 .subcategorias {
    display: flex;
    flex-direction: column;
@@ -400,7 +390,6 @@ header img {
    z-index: 1;
 }
 
-/* ========== FOOTER CARRINHO ========== */
 footer {
    position: fixed;
    z-index: 997;
@@ -428,7 +417,6 @@ footer img {
    height: 20px;
 }
 
-/* ========== OVERLAY E PAINEL CARRINHO ========== */
 .carrinho-overlay {
    position: fixed;
    inset: 0;
@@ -604,7 +592,6 @@ footer img {
    padding: 5px;
 }
 
-/* ========== ETAPAS ========== */
 .etapa-1,
 .etapa-2 {
    display: flex;
@@ -668,7 +655,6 @@ footer img {
    padding-bottom: 120px;
 }
 
-/* ========== RESUMO DO PEDIDO ========== */
 .resumo-pedido {
    background-color: #f9f9f9;
    padding: 15px;
@@ -715,7 +701,6 @@ footer img {
    color: #ff4747;
 }
 
-/* ========== FORMULÁRIO ========== */
 .form-secao {
    margin-bottom: 30px;
 }
@@ -857,6 +842,7 @@ footer img {
 }
 
 .secao-endereco,
+.secao-retirada,
 .secao-troco {
    animation: fadeIn 0.3s;
 }
@@ -872,7 +858,6 @@ footer img {
    }
 }
 
-/* ========== MODAL TAMANHOS - COMPACTO ========== */
 .modal-overlay {
    position: fixed;
    inset: 0;
@@ -1033,6 +1018,7 @@ footer img {
    font-weight: 600;
    cursor: pointer;
    transition: all 0.2s;
+   position: relative;
 }
 
 .modal-adicionar:hover {
@@ -1045,9 +1031,6 @@ footer img {
    transform: translateY(0);
 }
 
-/* ========== ANIMAÇÃO: ADICIONAR AO CARRINHO ========== */
-
-/* Efeito de "shrink + fade out" */
 @keyframes produtoAdicionado {
    0% {
       transform: scale(1);
@@ -1063,12 +1046,10 @@ footer img {
    }
 }
 
-/* Classe que será aplicada via JS quando adicionar */
 .produto.animando-adicao {
    animation: produtoAdicionado 0.6s ease-in-out;
 }
 
-/* Efeito de pulso no botão "+" */
 @keyframes pulsoBotao {
    0% {
       transform: scale(1);
@@ -1085,22 +1066,33 @@ footer img {
    animation: pulsoBotao 0.4s ease-in-out;
 }
 
-/* ========== ANIMAÇÕES DE FEEDBACK ========== */
-
-/* Animação 1: Botão cresce e volta (Pop) */
-@keyframes botaoPop {
-   0% {
-      transform: scale(1);
-   }
-   50% {
-      transform: scale(1.1);
-   }
-   100% {
-      transform: scale(1);
-   }
+@keyframes animacao-pop {
+   0%, 100% { transform: scale(1); }
+   50% { transform: scale(1.1); }
 }
 
-/* Animação 2: Ícone de check aparece */
+@keyframes animacao-fade-out {
+   from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+   to { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+}
+
+@keyframes animacao-shake {
+   0%, 100% { transform: translateX(0); }
+   25% { transform: translateX(-5px); }
+   75% { transform: translateX(5px); }
+}
+
+.animar-pop { animation: animacao-pop 0.3s ease-out; }
+.animar-fade-out { animation: animacao-fade-out 0.3s ease-out forwards; }
+.animar-shake { animation: animacao-shake 0.5s ease-in-out; }
+
+.modal-adicionar .check-icon {
+   position: absolute;
+   right: 15px;
+   font-size: 1.3em;
+   animation: checkAparecer 0.4s ease-out;
+}
+
 @keyframes checkAparecer {
    0% {
       opacity: 0;
@@ -1114,53 +1106,4 @@ footer img {
       opacity: 1;
       transform: scale(1);
    }
-}
-
-/* Animação 3: Modal some com fade-out */
-@keyframes modalFadeOut {
-   0% {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-   }
-   100% {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.95);
-   }
-}
-
-/* Animação 4: Carrinho no footer dá uma tremidinha */
-@keyframes carrinhoShake {
-   0%, 100% {
-      transform: translateX(0);
-   }
-   25% {
-      transform: translateX(-5px);
-   }
-   75% {
-      transform: translateX(5px);
-   }
-}
-
-/* Classes que serão aplicadas via JS */
-.modal-adicionar.animando {
-   animation: botaoPop 0.3s ease-out;
-}
-
-.modal-adicionar .check-icon {
-   position: absolute;
-   right: 15px;
-   font-size: 1.3em;
-   animation: checkAparecer 0.4s ease-out;
-}
-
-.modal-tamanhos.fechando {
-   animation: modalFadeOut 0.3s ease-out forwards;
-}
-
-.modal-overlay.fechando {
-   animation: modalFadeOut 0.3s ease-out forwards;
-}
-
-footer.shake {
-   animation: carrinhoShake 0.5s ease-in-out;
 }
