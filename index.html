@@ -99,7 +99,7 @@
    <section class="secao" id="combinados" style="display: none;"><div class="lista-produtos" id="lista-combinados"><p class="carregando">Carregando...</p></div></section>
    <section class="secao" id="bebidas" style="display: none;"><div class="lista-produtos" id="lista-bebidas"><p class="carregando">Carregando...</p></div></section>
 
-   <!-- ========== NOVO: CONTAINER DE PESQUISA GLOBAL ========== -->
+   <!-- CONTAINER DE PESQUISA GLOBAL -->
    <section class="secao-pesquisa-global" id="resultadosPesquisaGlobal" style="display: none;">
       <div class="pesquisa-global-header">
          <h2>Resultados da busca</h2>
@@ -164,7 +164,8 @@
                <div class="radio-texto"><strong>Retirar no local</strong><small>Buscar pessoalmente</small></div>
             </label>
          </div>
-         
+
+         <!-- ENTREGA: bloco de endereço -->
          <div class="form-secao secao-endereco" id="secaoEndereco" style="display: none;">
             <h3>Endereço de entrega</h3>
             <div class="form-grupo">
@@ -174,6 +175,15 @@
             <div class="form-grupo"><label for="rua">Rua *</label><input type="text" id="rua" placeholder="Nome da rua"></div>
             <div class="form-grupo"><label for="nomePessoa">Nome de quem vai receber *</label><input type="text" id="nomePessoa" placeholder="Nome"></div>
             <div class="form-grupo"><label for="referencia">Ponto de referência</label><textarea id="referencia" rows="2" placeholder="Ex: Próximo ao mercado (opcional)"></textarea></div>
+         </div>
+
+         <!-- RETIRADA: bloco do nome do responsável (CORREÇÃO) -->
+         <div class="form-secao secao-retirada" id="secaoRetirada" style="display: none;">
+            <h3>Dados para retirada</h3>
+            <div class="form-grupo">
+               <label for="nomeRetirada">Nome do responsável pela retirada *</label>
+               <input type="text" id="nomeRetirada" placeholder="Seu nome completo">
+            </div>
          </div>
          
          <div class="form-secao">
@@ -205,7 +215,7 @@
    <p class="modal-descricao" id="modalDescricao">Descrição do produto</p>
    <h4 class="modal-titulo-tamanhos">Escolha o tamanho:</h4>
    <div class="modal-tamanho-opcoes">
-      <!-- Botões serão inseridos dinamicamente via JavaScript -->
+      <!-- Botões inseridos dinamicamente via JavaScript -->
    </div>
    <button class="modal-adicionar" id="modalAdicionar">Adicionar ao Carrinho</button>
 </div>

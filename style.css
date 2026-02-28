@@ -62,9 +62,10 @@ header img {
 
 @keyframes pulso {
    0%, 100% { box-shadow: 0 0 0 0 rgba(67, 160, 71, 0.5); }
-   70% { box-shadow: 0 0 0 4px rgba(67, 160, 71, 0); }
+   70%       { box-shadow: 0 0 0 4px rgba(67, 160, 71, 0); }
 }
 
+/* ========== TOPO FIXO ========== */
 .topo-fixo {
    position: sticky;
    top: 0;
@@ -89,6 +90,7 @@ header img {
 .topo-fixo h1 { margin-top: 10px; }
 .topo-fixo h2 { margin-bottom: 10px; }
 
+/* ========== PESQUISA ========== */
 .pesquisa-container {
    position: relative;
    width: 90%;
@@ -139,6 +141,7 @@ header img {
    color: #ff4747;
 }
 
+/* ========== NAV CATEGORIAS ========== */
 .opcoes {
    overflow-x: auto;
    overflow-y: hidden;
@@ -176,6 +179,7 @@ header img {
    height: 27px;
 }
 
+/* ========== SEÇÕES E PRODUTOS ========== */
 .secao { padding-bottom: 60px; }
 
 .lista-produtos {
@@ -273,7 +277,7 @@ header img {
    font-size: 1.3em;
    font-weight: 300;
    cursor: pointer;
-   transition: all 0.2s ease;
+   transition: background-color 0.2s ease;
    display: flex;
    align-items: center;
    justify-content: center;
@@ -283,14 +287,9 @@ header img {
 
 .produto .adicionar-carrinho:hover {
    background-color: #ff2020;
-   transform: scale(1.08);
-   box-shadow: 0 3px 10px rgba(255, 71, 71, 0.4);
 }
 
-.produto .adicionar-carrinho:active {
-   transform: scale(0.95);
-}
-
+/* ========== PESQUISA GLOBAL ========== */
 .secao-pesquisa-global {
    padding: 20px;
    padding-bottom: 80px;
@@ -344,6 +343,7 @@ header img {
    font-size: 1em;
 }
 
+/* ========== SUBCATEGORIAS ========== */
 .subcategorias {
    display: flex;
    flex-direction: column;
@@ -390,6 +390,7 @@ header img {
    z-index: 1;
 }
 
+/* ========== FOOTER / CARRINHO ========== */
 footer {
    position: fixed;
    z-index: 997;
@@ -417,6 +418,7 @@ footer img {
    height: 20px;
 }
 
+/* ========== PAINEL CARRINHO ========== */
 .carrinho-overlay {
    position: fixed;
    inset: 0;
@@ -592,6 +594,7 @@ footer img {
    padding: 5px;
 }
 
+/* ========== ETAPAS ========== */
 .etapa-1,
 .etapa-2 {
    display: flex;
@@ -620,9 +623,7 @@ footer img {
    font-size: 1.3em;
 }
 
-.total-container span:first-child {
-   color: #666;
-}
+.total-container span:first-child { color: #666; }
 
 .total-valor {
    color: #ff4747;
@@ -648,6 +649,7 @@ footer img {
    background-color: #ff2020;
 }
 
+/* ========== FORMULÁRIO ETAPA 2 ========== */
 .formulario-conteudo {
    flex: 1;
    overflow-y: auto;
@@ -701,9 +703,7 @@ footer img {
    color: #ff4747;
 }
 
-.form-secao {
-   margin-bottom: 30px;
-}
+.form-secao { margin-bottom: 30px; }
 
 .form-secao h3 {
    margin: 0 0 15px 0;
@@ -728,9 +728,7 @@ footer img {
    background-color: #fff5f5;
 }
 
-.radio-opcao input[type="radio"] {
-   display: none;
-}
+.radio-opcao input[type="radio"] { display: none; }
 
 .radio-custom {
    width: 20px;
@@ -774,9 +772,7 @@ footer img {
    font-size: 0.85em;
 }
 
-.form-grupo {
-   margin-bottom: 15px;
-}
+.form-grupo { margin-bottom: 15px; }
 
 .form-grupo label {
    display: block;
@@ -841,30 +837,26 @@ footer img {
    font-size: 0.95em;
 }
 
+/* Animação de entrada para blocos condicionais */
 .secao-endereco,
 .secao-retirada,
 .secao-troco {
-   animation: fadeIn 0.3s;
+   animation: fadeIn 0.3s ease;
 }
 
 @keyframes fadeIn {
-   from {
-      opacity: 0;
-      transform: translateY(-10px);
-   }
-   to {
-      opacity: 1;
-      transform: translateY(0);
-   }
+   from { opacity: 0; transform: translateY(-8px); }
+   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ========== MODAL TAMANHOS ========== */
 .modal-overlay {
    position: fixed;
    inset: 0;
    background-color: rgba(0, 0, 0, 0.5);
    opacity: 0;
    visibility: hidden;
-   transition: opacity 0.3s, visibility 0.3s;
+   transition: opacity 0.25s, visibility 0.25s;
    z-index: 1000;
 }
 
@@ -877,7 +869,7 @@ footer img {
    position: fixed;
    top: 50%;
    left: 50%;
-   transform: translate(-50%, -50%) scale(0.9);
+   transform: translate(-50%, -50%) scale(0.92);
    background-color: white;
    border-radius: 16px;
    padding: 20px;
@@ -887,7 +879,7 @@ footer img {
    overflow-y: auto;
    opacity: 0;
    visibility: hidden;
-   transition: all 0.25s ease;
+   transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
    z-index: 1001;
    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
@@ -913,13 +905,11 @@ footer img {
    align-items: center;
    justify-content: center;
    border-radius: 50%;
-   transition: all 0.2s;
+   transition: background-color 0.2s;
    z-index: 10;
 }
 
-.modal-fechar:hover {
-   background-color: rgb(58, 58, 58);
-}
+.modal-fechar:hover { background-color: rgb(58, 58, 58); }
 
 .modal-img {
    width: 100%;
@@ -992,9 +982,7 @@ footer img {
    margin-bottom: 4px;
 }
 
-.btn-tamanho.selecionado .tamanho-letra {
-   color: #ff4747;
-}
+.btn-tamanho.selecionado .tamanho-letra { color: #ff4747; }
 
 .tamanho-preco {
    font-size: 0.85em;
@@ -1017,8 +1005,7 @@ footer img {
    font-size: 1.05em;
    font-weight: 600;
    cursor: pointer;
-   transition: all 0.2s;
-   position: relative;
+   transition: background-color 0.2s, transform 0.2s;
 }
 
 .modal-adicionar:hover {
@@ -1027,83 +1014,47 @@ footer img {
    box-shadow: 0 4px 12px rgba(255, 71, 71, 0.4);
 }
 
-.modal-adicionar:active {
-   transform: translateY(0);
+.modal-adicionar:active { transform: translateY(0); }
+
+/* ========================================
+   ANIMAÇÕES — LEVES E PERFORMÁTICAS
+   (sem clones no DOM, sem position:fixed
+    dinâmico que causava o quadrado preto)
+   ======================================== */
+
+/* Botão "+" confirma adição: escala + troca cor para verde */
+@keyframes btn-confirmado {
+   0%   { transform: scale(1);    background-color: #ff4747; }
+   40%  { transform: scale(1.22); background-color: #4CAF50; }
+   70%  { transform: scale(0.94); background-color: #4CAF50; }
+   100% { transform: scale(1);    background-color: #ff4747; }
 }
 
-@keyframes produtoAdicionado {
-   0% {
-      transform: scale(1);
-      opacity: 1;
-   }
-   50% {
-      transform: scale(0.95);
-      opacity: 0.7;
-   }
-   100% {
-      transform: scale(1);
-      opacity: 1;
-   }
+/* Footer sobe levemente para dar feedback de item adicionado */
+@keyframes carrinho-bounce {
+   0%, 100% { transform: translateY(0); }
+   30%       { transform: translateY(-7px); }
+   65%       { transform: translateY(-3px); }
 }
 
-.produto.animando-adicao {
-   animation: produtoAdicionado 0.6s ease-in-out;
+/* Botão principal do modal também usa a confirmação */
+@keyframes modal-btn-confirmado {
+   0%   { transform: scale(1);    background-color: #ff4747; }
+   35%  { transform: scale(0.96); background-color: #4CAF50; }
+   65%  { transform: scale(1.03); background-color: #4CAF50; }
+   100% { transform: scale(1);    background-color: #ff4747; }
 }
 
-@keyframes pulsoBotao {
-   0% {
-      transform: scale(1);
-   }
-   50% {
-      transform: scale(1.2);
-   }
-   100% {
-      transform: scale(1);
-   }
+.adicionar-carrinho.btn-feedback {
+   animation: btn-confirmado 0.5s ease forwards;
+   pointer-events: none; /* evita duplo clique durante animação */
 }
 
-.adicionar-carrinho.adicionado {
-   animation: pulsoBotao 0.4s ease-in-out;
+.modal-adicionar.btn-feedback {
+   animation: modal-btn-confirmado 0.5s ease forwards;
+   pointer-events: none;
 }
 
-@keyframes animacao-pop {
-   0%, 100% { transform: scale(1); }
-   50% { transform: scale(1.1); }
-}
-
-@keyframes animacao-fade-out {
-   from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-   to { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
-}
-
-@keyframes animacao-shake {
-   0%, 100% { transform: translateX(0); }
-   25% { transform: translateX(-5px); }
-   75% { transform: translateX(5px); }
-}
-
-.animar-pop { animation: animacao-pop 0.3s ease-out; }
-.animar-fade-out { animation: animacao-fade-out 0.3s ease-out forwards; }
-.animar-shake { animation: animacao-shake 0.5s ease-in-out; }
-
-.modal-adicionar .check-icon {
-   position: absolute;
-   right: 15px;
-   font-size: 1.3em;
-   animation: checkAparecer 0.4s ease-out;
-}
-
-@keyframes checkAparecer {
-   0% {
-      opacity: 0;
-      transform: scale(0.5);
-   }
-   50% {
-      opacity: 1;
-      transform: scale(1.2);
-   }
-   100% {
-      opacity: 1;
-      transform: scale(1);
-   }
+footer.carrinho-bounce {
+   animation: carrinho-bounce 0.45s ease;
 }
