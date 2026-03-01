@@ -483,6 +483,8 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('tituloCarrinho').textContent    = 'Finalizar Pedido';
       document.getElementById('voltarCarrinho').style.display  = 'flex';
       atualizarResumoPedido();
+
+      document.querySelector('.formulario-conteudo').scrollTop = 0;
    }
 
    function voltarParaEtapa1() {
