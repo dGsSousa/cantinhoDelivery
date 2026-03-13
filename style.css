@@ -1058,3 +1058,115 @@ footer img {
 footer.carrinho-bounce {
    animation: carrinho-bounce 0.45s ease;
 }
+
+/* ========== MEIO A MEIO - TOGGLE E DROPDOWNS ========== */
+
+/* Toggle de tipo de pizza */
+.tipo-pizza-toggle {
+   display: flex;
+   gap: 8px;
+   margin-bottom: 16px;
+}
+
+.btn-tipo-pizza {
+   flex: 1;
+   padding: 12px 10px;
+   border: 2px solid #e0e0e0;
+   background: white;
+   border-radius: 8px;
+   cursor: pointer;
+   font-size: 0.95em;
+   font-weight: 500;
+   color: #666;
+   transition: all 0.2s;
+}
+
+.btn-tipo-pizza:hover {
+   border-color: #ff8787;
+   background-color: #fff9f9;
+}
+
+.btn-tipo-pizza.ativo {
+   background: #fff5f5;
+   border-color: #ff4747;
+   color: #ff4747;
+   font-weight: 600;
+   box-shadow: 0 0 0 3px rgba(255, 71, 71, 0.1);
+}
+
+/* Container de seleção de sabores */
+.selecao-sabores {
+   display: none;
+   flex-direction: column;
+   gap: 12px;
+   margin-bottom: 16px;
+   padding: 15px;
+   background-color: #f9f9f9;
+   border-radius: 10px;
+}
+
+.selecao-sabores.ativo {
+   display: flex;
+   animation: fadeIn 0.3s ease-out;
+}
+
+/* Grupo de cada sabor */
+.sabor-grupo {
+   display: flex;
+   flex-direction: column;
+   gap: 6px;
+}
+
+.sabor-grupo label {
+   font-size: 0.9em;
+   color: #666;
+   font-weight: 500;
+}
+
+.select-sabor {
+   width: 100%;
+   padding: 12px;
+   border: 2px solid #e0e0e0;
+   border-radius: 8px;
+   font-size: 1em;
+   font-family: inherit;
+   background-color: white;
+   color: #333;
+   cursor: pointer;
+   appearance: none;
+   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%23666' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+   background-repeat: no-repeat;
+   background-position: right 14px center;
+   transition: border-color 0.2s;
+}
+
+.select-sabor:focus {
+   outline: none;
+   border-color: #ff8787;
+}
+
+.select-sabor.erro {
+   border-color: #ff4747;
+   background-color: #fff5f5;
+}
+
+/* Aviso de sabores */
+.aviso-sabores {
+   font-size: 0.85em;
+   color: #999;
+   margin: 0;
+   text-align: center;
+   display: none;
+}
+
+.aviso-sabores.ativo {
+   display: block;
+   color: #ff4747;
+   animation: fadeIn 0.3s;
+}
+
+/* Ocultar título e botões de tamanho quando necessário */
+.modal-titulo-tamanhos.oculto,
+.modal-tamanho-opcoes.oculto {
+   display: none;
+}

@@ -206,17 +206,47 @@
    </div>
 </div>
 
-<!-- ========== MODAL TAMANHOS ========== -->
+<!-- ========== MODAL DE TAMANHOS (COM MEIO A MEIO) ========== -->
 <div class="modal-overlay" id="modalOverlay"></div>
+
 <div class="modal-tamanhos" id="modalTamanhos">
-   <button class="modal-fechar" id="modalFechar">✕</button>
-   <img src="" alt="" id="modalImg" class="modal-img">
-   <h3 id="modalNome">Nome do produto</h3>
+   <button class="modal-fechar" id="modalFechar">×</button>
+   
+   <img src="" alt="" class="modal-img" id="modalImg">
+   
+   <h3 id="modalNome">Nome do Produto</h3>
    <p class="modal-descricao" id="modalDescricao">Descrição do produto</p>
-   <h4 class="modal-titulo-tamanhos">Escolha o tamanho:</h4>
-   <div class="modal-tamanho-opcoes">
-      <!-- Botões inseridos dinamicamente via JavaScript -->
+   
+   <!-- ========== TOGGLE: SABOR ÚNICO OU MEIO A MEIO ========== -->
+   <div class="tipo-pizza-toggle">
+      <button type="button" id="btnUnico" class="btn-tipo-pizza ativo">Sabor Único</button>
+      <button type="button" id="btnMeioAMeio" class="btn-tipo-pizza">Dois Sabores</button>
    </div>
+   
+   <!-- ========== SELEÇÃO DE SABORES (MEIO A MEIO) ========== -->
+   <div class="selecao-sabores" id="selecaoSabores">
+      <div class="sabor-grupo">
+         <label for="sabor1">Primeiro sabor:</label>
+         <select id="sabor1" class="select-sabor">
+            <option value="">Selecione o sabor...</option>
+         </select>
+      </div>
+      <div class="sabor-grupo">
+         <label for="sabor2">Segundo sabor:</label>
+         <select id="sabor2" class="select-sabor">
+            <option value="">Selecione o sabor...</option>
+         </select>
+      </div>
+      <p class="aviso-sabores" id="avisoSabores">Escolha dois sabores diferentes para continuar</p>
+   </div>
+   
+   <!-- ========== ESCOLHA DO TAMANHO ========== -->
+   <h4 class="modal-titulo-tamanhos" id="tituloTamanhos">Escolha o tamanho:</h4>
+   <div class="modal-tamanho-opcoes" id="containerTamanhos">
+      <!-- Botões P, M, G serão renderizados aqui via JS -->
+   </div>
+   
+   <!-- ========== BOTÃO ADICIONAR ========== -->
    <button class="modal-adicionar" id="modalAdicionar">Adicionar ao Carrinho</button>
 </div>
 
