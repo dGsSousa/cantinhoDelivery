@@ -306,6 +306,136 @@ document.addEventListener('DOMContentLoaded', function() {
    let tipoSelecao = 'unico';
    let sabor1Selecionado = null;
    let sabor2Selecionado = null;
+
+   // =====================================================================
+   // ========== PREÇO DINÂMICO NO MODAL (NOVO) ===========================
+   // =====================================================================
+
+   /**
+    * Calcula e exibe o preço correto no modal em tempo real.
+    * Chamada toda vez que muda: tamanho, sabor 1, sabor 2 ou modo (único/meio-a-meio).
+    * Aplica animação de cor quando o preço sobe.
+    */
+   function atualizarPrecoModal() {
+      const el = document.getElementById('modalPreco');
+      if (!el || !produtoAtual) return;
+
+      let novoTexto = '';
+      let novoValor = 0;
+
+      if (tipoSelecao === 'unico') {
+         // ---- Sabor único ----
+         if (tamanhoSelecionado) {
+            let preco = 0;
+            if (tamanhoSelecionado === 'P') preco = produtoAtual.precoP || 0;
+            else if (tamanhoSelecionado === 'M') preco = produtoAtual.precoM || 0;
+            else preco = produtoAtual.precoG || 0;
+            novoTexto = 'R$ ' + preco.toFixed(2).replace('.', ',');
+            novoValor = preco;
+         } else {
+            // Nenhum tamanho selecionado → mostra "a partir de"
+            const precos = [produtoAtual.precoP, produtoAtual.precoM, produtoAtual.precoG]
+               .filter(p => p && p > 0);
+            const min = precos.length ? Math.min(...precos) : 0;
+            novoTexto = min
+               ? 'A partir de R$ ' + min.toFixed(2).replace('.', ',')
+               : 'Selecione o tamanho';
+            novoValor = min;
+         }
+      } else {
+         // ---- Meio a meio ----
+         const s1 = document.getElementById('sabor1').value;
+         const s2 = document.getElementById('sabor2').value;
+
+         if (s1 && s2 && s1 !== s2) {
+            if (tamanhoSelecionado) {
+               // Ambos sabores + tamanho selecionados → preço exato
+               const preco = calcularPrecoMeioAMeio(s1, s2, tamanhoSelecionado);
+               novoTexto = 'R$ ' + preco.toFixed(2).replace('.', ',');
+               novoValor = preco;
+            } else {
+               // Ambos sabores mas sem tamanho → "a partir de" (menor max entre os tamanhos)
+               const precosPorTamanho = ['P', 'M', 'G'].map(t => calcularPrecoMeioAMeio(s1, s2, t)).filter(p => p > 0);
+               const min = precosPorTamanho.length ? Math.min(...precosPorTamanho) : 0;
+               novoTexto = min
+                  ? 'A partir de R$ ' + min.toFixed(2).replace('.', ',')
+                  : 'Selecione o tamanho';
+               novoValor = min;
+            }
+         } else if (s1 || s2) {
+            // Só um sabor preenchido
+            novoTexto = 'Selecione o 2º sabor';
+            novoValor = 0;
+         } else {
+            // Nenhum sabor
+            novoTexto = 'Selecione os sabores';
+            novoValor = 0;
+         }
+      }
+
+      // ---- Animação de mudança de preço ----
+      const valorAnterior = parseFloat(el.dataset.valor) || 0;
+      el.dataset.valor = novoValor;
+
+      if (novoValor > 0 && novoValor !== valorAnterior) {
+         // Remove classes anteriores para reiniciar a animação
+         el.classList.remove('modal-preco-subiu', 'modal-preco-mudou');
+         // Força reflow para que a remoção seja percebida pelo browser
+         void el.offsetWidth;
+
+         if (novoValor > valorAnterior && valorAnterior > 0) {
+            // Preço subiu → destaque em verde
+            el.classList.add('modal-preco-subiu');
+            setTimeout(() => el.classList.remove('modal-preco-subiu'), 900);
+         } else {
+            // Preço mudou (caiu ou entrou do zero) → destaque neutro
+            el.classList.add('modal-preco-mudou');
+            setTimeout(() => el.classList.remove('modal-preco-mudou'), 600);
+         }
+      }
+
+      el.textContent = novoTexto;
+   }
+
+   // =====================================================================
+// ========== PREÇOS DOS BOTÕES DE TAMANHO (NOVO) ======================
+// =====================================================================
+function atualizarPrecosBotoesTamanho() {
+   const botoes = document.querySelectorAll('.btn-tamanho');
+   if (!botoes.length || !produtoAtual) return;
+
+   botoes.forEach(botao => {
+      const letra = botao.dataset.tamanho;           // 'P', 'M' ou 'G'
+      const spanPreco = botao.querySelector('.tamanho-preco');
+      if (!spanPreco) return;
+
+      let preco = 0;
+
+      if (tipoSelecao === 'meio-a-meio') {
+         const s1 = document.getElementById('sabor1').value;
+         const s2 = document.getElementById('sabor2').value;
+         if (s1 && s2 && s1 !== s2) {
+            preco = calcularPrecoMeioAMeio(s1, s2, letra);
+         } else {
+            // Sabores ainda incompletos → mostra preço do produto original
+            if (letra === 'P') preco = produtoAtual.precoP || 0;
+            else if (letra === 'M') preco = produtoAtual.precoM || 0;
+            else preco = produtoAtual.precoG || 0;
+         }
+      } else {
+         // Sabor único → preço do produto original
+         if (letra === 'P') preco = produtoAtual.precoP || 0;
+         else if (letra === 'M') preco = produtoAtual.precoM || 0;
+         else preco = produtoAtual.precoG || 0;
+      }
+
+      if (preco > 0) {
+         spanPreco.textContent = 'R$ ' + preco.toFixed(2).replace('.', ',');
+      }
+   });
+}
+
+   // =====================================================================
    
    // Funções do carrinho
    function abrirCarrinho() { 
@@ -360,6 +490,10 @@ document.addEventListener('DOMContentLoaded', function() {
       tipoSelecao = 'unico';
       sabor1Selecionado = null;
       sabor2Selecionado = null;
+
+      // Zera o data-valor para não herdar animação de abertura anterior
+      const elPreco = document.getElementById('modalPreco');
+      if (elPreco) elPreco.dataset.valor = '0';
       
       const urlImagem = processarURLImagem(produtoAtual.img);
       modalImg.src = urlImagem; 
@@ -369,7 +503,6 @@ document.addEventListener('DOMContentLoaded', function() {
       modalNome.textContent = produtoAtual.nome; 
       modalDescricao.textContent = produtoAtual.descricao;
       
-      // ========== CORREÇÃO 3: Verifica se é pizza ==========
       const ehPizza = produtoAtual.categoria === 'pizza-salgada' || produtoAtual.categoria === 'pizza-doce';
       const toggleContainer = document.querySelector('.tipo-pizza-toggle');
       const selecaoSabores = document.getElementById('selecaoSabores');
@@ -378,7 +511,6 @@ document.addEventListener('DOMContentLoaded', function() {
          toggleContainer.style.display = 'flex';
          renderizarDropdownsSabores();
          
-         // ========== CORREÇÃO 2.3: Pré-seleciona sabor atual ==========
          const select1 = document.getElementById('sabor1');
          select1.value = produtoAtual.nome;
          sabor1Selecionado = produtoAtual.nome;
@@ -387,15 +519,16 @@ document.addEventListener('DOMContentLoaded', function() {
          document.getElementById('btnMeioAMeio').classList.remove('ativo');
          selecaoSabores.classList.remove('ativo');
       } else {
-         // ========== CORREÇÃO 3: Produtos não-pizza ==========
          toggleContainer.style.display = 'none';
          selecaoSabores.classList.remove('ativo');
       }
       
-      // ========== CORREÇÃO 2.1: Sempre renderiza tamanhos ==========
       renderizarBotoesTamanho();
       document.getElementById('tituloTamanhos').classList.remove('oculto');
       document.getElementById('containerTamanhos').classList.remove('oculto');
+
+      // ---- Exibe preço inicial (sem animação, pois data-valor está zerado) ----
+      atualizarPrecoModal();
       
       modalOverlay.classList.add('ativo'); 
       modalTamanhos.classList.add('ativo'); 
@@ -449,6 +582,8 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.btn-tamanho').forEach(b => b.classList.remove('selecionado'));
             this.classList.add('selecionado');
             tamanhoSelecionado = this.dataset.tamanho;
+            // ---- Atualiza preço no modal ao escolher tamanho ----
+            atualizarPrecoModal();
          });
          
          containerOpcoes.appendChild(botao);
@@ -472,6 +607,7 @@ document.addEventListener('DOMContentLoaded', function() {
          containerTamanhos.classList.add('oculto');
          select1.classList.remove('erro');
          select2.classList.remove('erro');
+         atualizarPrecoModal();
          return false;
       }
       
@@ -480,6 +616,7 @@ document.addEventListener('DOMContentLoaded', function() {
          aviso.classList.add('ativo');
          tituloTamanhos.classList.add('oculto');
          containerTamanhos.classList.add('oculto');
+         atualizarPrecoModal();
          return false;
       }
       
@@ -490,6 +627,7 @@ document.addEventListener('DOMContentLoaded', function() {
          select2.classList.add('erro');
          tituloTamanhos.classList.add('oculto');
          containerTamanhos.classList.add('oculto');
+         atualizarPrecoModal();
          return false;
       }
       
@@ -498,6 +636,10 @@ document.addEventListener('DOMContentLoaded', function() {
       select2.classList.remove('erro');
       tituloTamanhos.classList.remove('oculto');
       containerTamanhos.classList.remove('oculto');
+
+      // ---- Atualiza preços dos botões de tamanho e o preço do modal ----
+      atualizarPrecosBotoesTamanho();   // <-- ADICIONAR ESTA LINHA
+      atualizarPrecoModal();
       return true;
    }
    
@@ -519,6 +661,7 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('tituloCarrinho').textContent = 'Finalizar Pedido'; 
       document.getElementById('voltarCarrinho').style.display = 'flex';
       atualizarResumoPedido();
+      document.querySelector('.formulario-conteudo').scrollTop = 0;
    }
    
    function voltarParaEtapa1() { 
@@ -658,7 +801,6 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('btnMeioAMeio').classList.remove('ativo');
       document.getElementById('selecaoSabores').classList.remove('ativo');
       
-      // ========== CORREÇÃO 2.1: Mostra tamanhos ==========
       document.getElementById('tituloTamanhos').classList.remove('oculto');
       document.getElementById('containerTamanhos').classList.remove('oculto');
       
@@ -666,6 +808,10 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('sabor2').value = '';
       sabor1Selecionado = produtoAtual.nome;
       sabor2Selecionado = null;
+
+      // ---- Atualiza preço ao voltar para sabor único ----
+      atualizarPrecosBotoesTamanho();
+      atualizarPrecoModal();
    });
    
    document.getElementById('btnMeioAMeio').addEventListener('click', function() {
@@ -678,9 +824,13 @@ document.addEventListener('DOMContentLoaded', function() {
       
       tamanhoSelecionado = null;
       document.querySelectorAll('.btn-tamanho').forEach(b => b.classList.remove('selecionado'));
+
+      // ---- Atualiza preço ao entrar no modo meio a meio ----
+      atualizarPrecoModal();
    });
    
    // Event listeners - Dropdowns de sabores
+   // (validarSelecaoMeioAMeio já chama atualizarPrecoModal internamente)
    document.getElementById('sabor1').addEventListener('change', validarSelecaoMeioAMeio);
    document.getElementById('sabor2').addEventListener('change', validarSelecaoMeioAMeio);
    
@@ -698,7 +848,6 @@ document.addEventListener('DOMContentLoaded', function() {
          }
       }
       
-      // ========== CORREÇÃO 1: Sem ícone de check ==========
       const botao = this;
       botao.classList.add('animando');
       
@@ -712,7 +861,6 @@ document.addEventListener('DOMContentLoaded', function() {
          
          nomeProduto = obterNomeCompleto(produtoAtual.categoria, produtoAtual.nome) + ' (' + tamanhoSelecionado + ')';
       } else {
-         // ========== CORREÇÃO 2.2: Cálculo correto do preço ==========
          precoNumero = calcularPrecoMeioAMeio(sabor1Selecionado, sabor2Selecionado, tamanhoSelecionado);
          nomeProduto = 'Pizza Meio a Meio (' + sabor1Selecionado + ' / ' + sabor2Selecionado + ') (' + tamanhoSelecionado + ')';
       }

@@ -177,7 +177,7 @@
             <div class="form-grupo"><label for="referencia">Ponto de referência</label><textarea id="referencia" rows="2" placeholder="Ex: Próximo ao mercado (opcional)"></textarea></div>
          </div>
 
-         <!-- RETIRADA: bloco do nome do responsável (CORREÇÃO) -->
+         <!-- RETIRADA: bloco do nome do responsável -->
          <div class="form-secao secao-retirada" id="secaoRetirada" style="display: none;">
             <h3>Dados para retirada</h3>
             <div class="form-grupo">
@@ -216,7 +216,10 @@
    
    <h3 id="modalNome">Nome do Produto</h3>
    <p class="modal-descricao" id="modalDescricao">Descrição do produto</p>
-   
+
+   <!-- ========== PREÇO DINÂMICO DO MODAL (NOVO) ========== -->
+   <p class="modal-preco" id="modalPreco" data-valor="0"></p>
+
    <!-- ========== TOGGLE: SABOR ÚNICO OU MEIO A MEIO ========== -->
    <div class="tipo-pizza-toggle">
       <button type="button" id="btnUnico" class="btn-tipo-pizza ativo">Sabor Único</button>

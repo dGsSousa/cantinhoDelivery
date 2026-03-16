@@ -920,18 +920,55 @@ footer img {
 }
 
 .modal-tamanhos h3 {
-   margin: 0 0 6px 0;
+   margin: 0 0 4px 0;
    font-size: 1.25em;
    color: #333;
    line-height: 1.3;
 }
 
 .modal-descricao {
-   margin: 0 0 16px 0;
+   margin: 0 0 8px 0;
    color: #777;
    font-size: 0.88em;
    line-height: 1.4;
 }
+
+/* ========== PREÇO DINÂMICO DO MODAL (NOVO) ========== */
+.modal-preco {
+   font-size: 1.3em;
+   font-weight: 700;
+   color: #ff4747;
+   margin: 0 0 16px 0;
+   min-height: 1.6em;              /* evita salto de layout quando o texto muda */
+   transition: color 0.2s ease;
+}
+
+/* Preço subiu → pulsa em verde brevemente */
+@keyframes modal-preco-subiu-anim {
+   0%   { color: #ff4747; transform: scale(1); }
+   25%  { color: #2e7d32; transform: scale(1.12); }
+   60%  { color: #2e7d32; transform: scale(1.06); }
+   100% { color: #ff4747; transform: scale(1); }
+}
+
+/* Preço mudou (mas não subiu) → pulsa brevemente sem cor verde */
+@keyframes modal-preco-mudou-anim {
+   0%   { color: #ff4747; transform: scale(1); }
+   35%  { color: #e65100; transform: scale(1.07); }
+   100% { color: #ff4747; transform: scale(1); }
+}
+
+.modal-preco.modal-preco-subiu {
+   animation: modal-preco-subiu-anim 0.85s ease forwards;
+   display: inline-block;         /* transform funciona em inline-block */
+}
+
+.modal-preco.modal-preco-mudou {
+   animation: modal-preco-mudou-anim 0.55s ease forwards;
+   display: inline-block;
+}
+
+/* ========================================================= */
 
 .modal-titulo-tamanhos {
    margin: 0 0 10px 0;
@@ -1018,11 +1055,8 @@ footer img {
 
 /* ========================================
    ANIMAÇÕES — LEVES E PERFORMÁTICAS
-   (sem clones no DOM, sem position:fixed
-    dinâmico que causava o quadrado preto)
    ======================================== */
 
-/* Botão "+" confirma adição: escala + troca cor para verde */
 @keyframes btn-confirmado {
    0%   { transform: scale(1);    background-color: #ff4747; }
    40%  { transform: scale(1.22); background-color: #4CAF50; }
@@ -1030,14 +1064,12 @@ footer img {
    100% { transform: scale(1);    background-color: #ff4747; }
 }
 
-/* Footer sobe levemente para dar feedback de item adicionado */
 @keyframes carrinho-bounce {
    0%, 100% { transform: translateY(0); }
    30%       { transform: translateY(-7px); }
    65%       { transform: translateY(-3px); }
 }
 
-/* Botão principal do modal também usa a confirmação */
 @keyframes modal-btn-confirmado {
    0%   { transform: scale(1);    background-color: #ff4747; }
    35%  { transform: scale(0.96); background-color: #4CAF50; }
@@ -1047,7 +1079,7 @@ footer img {
 
 .adicionar-carrinho.btn-feedback {
    animation: btn-confirmado 0.5s ease forwards;
-   pointer-events: none; /* evita duplo clique durante animação */
+   pointer-events: none;
 }
 
 .modal-adicionar.btn-feedback {
@@ -1061,7 +1093,6 @@ footer.carrinho-bounce {
 
 /* ========== MEIO A MEIO - TOGGLE E DROPDOWNS ========== */
 
-/* Toggle de tipo de pizza */
 .tipo-pizza-toggle {
    display: flex;
    gap: 8px;
@@ -1094,7 +1125,6 @@ footer.carrinho-bounce {
    box-shadow: 0 0 0 3px rgba(255, 71, 71, 0.1);
 }
 
-/* Container de seleção de sabores */
 .selecao-sabores {
    display: none;
    flex-direction: column;
@@ -1110,7 +1140,6 @@ footer.carrinho-bounce {
    animation: fadeIn 0.3s ease-out;
 }
 
-/* Grupo de cada sabor */
 .sabor-grupo {
    display: flex;
    flex-direction: column;
@@ -1150,7 +1179,6 @@ footer.carrinho-bounce {
    background-color: #fff5f5;
 }
 
-/* Aviso de sabores */
 .aviso-sabores {
    font-size: 0.85em;
    color: #999;
@@ -1165,7 +1193,6 @@ footer.carrinho-bounce {
    animation: fadeIn 0.3s;
 }
 
-/* Ocultar título e botões de tamanho quando necessário */
 .modal-titulo-tamanhos.oculto,
 .modal-tamanho-opcoes.oculto {
    display: none;
