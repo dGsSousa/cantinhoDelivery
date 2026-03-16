@@ -141,6 +141,17 @@ function animarVooParaCarrinho(imagemOrigem) {
    setTimeout(() => clone.remove(), 800);
 }
 
+function mostrarFloatMais(elementoOrigem) {
+   const rect = elementoOrigem.getBoundingClientRect();
+   const el = document.createElement('span');
+   el.className = 'float-plus-one';
+   el.textContent = '+1';
+   el.style.top  = (rect.top + rect.height / 2 - 10) + 'px';
+   el.style.left = (rect.left + rect.width  / 2 - 12) + 'px';
+   document.body.appendChild(el);
+   setTimeout(() => el.remove(), 750);
+}
+
 // ========== FUNÇÕES DE STATUS ==========
 function normalizarTexto(str) {
    if (!str) return '';
@@ -468,7 +479,7 @@ function atualizarPrecosBotoesTamanho() {
       carrinho.forEach(item => {
          total += item.precoNumero * item.quantidade;
          quantidadeTotal += item.quantidade;
-         carrinhoItens.innerHTML += '<div class="item-carrinho" data-id="'+item.id+'"><img src="'+item.img+'" alt="'+item.nome+'" onerror="this.src=\'images/placeholder.jpg\'"><div class="item-info"><h4>'+item.nome+'</h4><p class="item-preco">'+item.preco+'</p><div class="item-quantidade"><button class="btn-quantidade" data-acao="diminuir" data-id="'+item.id+'">-</button><span class="quantidade-numero">'+item.quantidade+'</span><button class="btn-quantidade" data-acao="aumentar" data-id="'+item.id+'">+</button></div></div><button class="remover-item" data-id="'+item.id+'">🗑️</button></div>';
+         carrinhoItens.innerHTML += '<div class="item-carrinho" data-id="'+item.id+'"><img src="'+item.img+'" alt="'+item.nome+'" onerror="this.src=\'images/placeholder.jpg\'"><div class="item-info"><h4>'+item.nome+'</h4><p class="item-preco">'+item.preco+'</p>'+(item.quantidade > 1 ? '<p class="item-preco-total">Total: R$ '+(item.precoNumero * item.quantidade).toFixed(2).replace(".", ",")+'</p>' : '')+'<div class="item-quantidade"><button class="btn-quantidade" data-acao="diminuir" data-id="'+item.id+'">-</button><span class="quantidade-numero">'+item.quantidade+'</span><button class="btn-quantidade" data-acao="aumentar" data-id="'+item.id+'">+</button></div></div><button class="remover-item" data-id="'+item.id+'">🗑️</button></div>';
       });
       totalValor.textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
       footerCarrinho.innerHTML = '<a href="#carrinho">('+quantidadeTotal+') Meu Carrinho <img src="icons/carrinho-icon.png"></a>';
@@ -882,6 +893,9 @@ function atualizarPrecosBotoesTamanho() {
       else carrinho.push(produto);
       
       atualizarCarrinho();
+
+      mostrarFloatMais(botao);
+      botao.style.backgroundColor = '#4CAF50';
       
       const imagemModal = document.getElementById('modalImg');
       animarVooParaCarrinho(imagemModal);
@@ -897,6 +911,7 @@ function atualizarPrecosBotoesTamanho() {
       setTimeout(() => {
          fecharModalTamanhos();
          botao.classList.remove('animando');
+         botao.style.backgroundColor = '';
          modalTamanhos.classList.remove('fechando');
          modalOverlay.classList.remove('fechando');
       }, 600);
@@ -915,6 +930,8 @@ function atualizarPrecosBotoesTamanho() {
          }, 600);
          
          e.target.classList.add('adicionado');
+         e.target.classList.add('btn-pop'); 
+         mostrarFloatMais(e.target);
 
          const produto = { 
             id: Date.now(), 
@@ -934,6 +951,7 @@ function atualizarPrecosBotoesTamanho() {
          setTimeout(() => { 
             e.target.style.backgroundColor = '#ff4747'; 
             e.target.classList.remove('adicionado');
+            e.target.classList.remove('btn-pop');
          }, 1000);
 
          const imagemProduto = produtoDiv.querySelector('img');
